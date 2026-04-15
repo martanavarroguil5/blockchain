@@ -18,15 +18,15 @@ Bitcoin Proof Explorer
 - M5-M7 Optional Modules:
 
 ## Current Progress
-- 
-- 
-- 
+- Repository cloned and connected to GitHub.
+- First README update committed and pushed.
+- Milestone 2 API script completed with live Bitcoin data from Blockstream.
 
 ## Next Step
-- 
+- Start building M1 by showing live proof-of-work metrics in the dashboard.
 
 ## Main Problem or Blocker
-- 
+- No major blocker right now.
 
 ## How to Run
 ```bash
