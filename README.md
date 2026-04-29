@@ -35,3 +35,21 @@ Statistical anomaly detection for unusual Bitcoin block inter-arrival times. The
 pip install -r requirements.txt
 streamlit run app.py
 ```
+
+<!-- student-repo-auditor:teacher-feedback:start -->
+## Teacher Feedback
+
+### Kick-off Review
+
+Review time: 2026-04-29 20:44 CEST
+Status: Amber
+
+Strength:
+- I can see the dashboard structure integrating the checkpoint modules.
+
+Improve now:
+- The README should now reflect the checkpoint more explicitly, including progress, blockers, and updated module status.
+
+Next step:
+- Update the README so progress, blockers, module status, and next step match the checkpoint format exactly.
+<!-- student-repo-auditor:teacher-feedback:end -->
