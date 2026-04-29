@@ -9,34 +9,12 @@ import streamlit as st
 from streamlit_autorefresh import st_autorefresh
 
 from api.blockchain_client import BlockchainApiError, get_client
-
-
-def bits_to_target(bits: int) -> int:
-    exponent = bits >> 24
-    mantissa = bits & 0xFFFFFF
-    if exponent <= 3:
-        return mantissa >> (8 * (3 - exponent))
-    return mantissa << (8 * (exponent - 3))
-
-
-def estimate_hash_rate_hs(difficulty: float) -> float:
-    return difficulty * (2**32) / 600
-
-
-def human_hash_rate(hash_rate_hs: float) -> str:
-    units = ["H/s", "kH/s", "MH/s", "GH/s", "TH/s", "PH/s", "EH/s", "ZH/s"]
-    value = float(hash_rate_hs)
-    for unit in units:
-        if value < 1000 or unit == units[-1]:
-            return f"{value:,.2f} {unit}"
-        value /= 1000
-    return f"{value:,.2f} ZH/s"
-
-
-def leading_zero_bits(value: int) -> int:
-    if value <= 0:
-        return 256
-    return max(0, 256 - value.bit_length())
+from modules.bitcoin_math import (
+    bits_to_target,
+    estimate_hash_rate_hs,
+    human_hash_rate,
+    leading_zero_bits,
+)
 
 
 @st.cache_data(ttl=60, show_spinner=False)
@@ -115,7 +93,7 @@ def render_m1() -> None:
             labels={"minutes_since_prev": "Minutes between blocks"},
         )
         interval_fig.update_layout(bargap=0.08)
-        st.plotly_chart(interval_fig, use_container_width=True)
+        st.plotly_chart(interval_fig, width="stretch")
 
     with stats_col:
         st.markdown("#### Inter-block timing stats")
@@ -144,7 +122,7 @@ def render_m1() -> None:
         line_color="firebrick",
         annotation_text="10-minute target",
     )
-    st.plotly_chart(trend_fig, use_container_width=True)
+    st.plotly_chart(trend_fig, width="stretch")
 
     st.markdown("#### Latest block summary")
     st.json(

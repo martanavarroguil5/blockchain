@@ -52,6 +52,12 @@ class BlockchainClient:
     def get_block(self, block_hash: str) -> dict[str, Any]:
         return self._get_json(f"/block/{block_hash}")
 
+    def get_block_hash_by_height(self, height: int) -> str:
+        return self._get_text(f"/block-height/{height}")
+
+    def get_block_by_height(self, height: int) -> dict[str, Any]:
+        return self.get_block(self.get_block_hash_by_height(height))
+
     def get_block_status(self, block_hash: str) -> dict[str, Any]:
         return self._get_json(f"/block/{block_hash}/status")
 

@@ -21,11 +21,11 @@ st.caption(
 
 with st.sidebar:
     st.header("Project Status")
-    st.markdown("- M1: in progress")
-    st.markdown("- M2: pending")
-    st.markdown("- M3: pending")
-    st.markdown("- M4: planned")
-    st.info("Recommended first milestone: finish live API connection and M1.")
+    st.markdown("- M1: operational")
+    st.markdown("- M2: operational")
+    st.markdown("- M3: operational")
+    st.markdown("- M4: checkpoint skeleton")
+    st.info("Checkpoint 29 April: M1, M2, and M3 are visible in the dashboard.")
 
 overview_tab, m1_tab, m2_tab, m3_tab, m4_tab = st.tabs(
     [
