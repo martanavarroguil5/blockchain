@@ -8,6 +8,7 @@ import streamlit as st
 
 from api.blockchain_client import BlockchainApiError, get_client
 from modules.bitcoin_math import bitcoin_hash_hex, bits_to_target, double_sha256, leading_zero_bits
+from modules.ui import module_header
 
 
 @dataclass(frozen=True, slots=True)
@@ -73,13 +74,16 @@ def load_latest_header() -> tuple[dict[str, object], ParsedBlockHeader]:
 
 
 def render_m2() -> None:
-    st.subheader("M2 - Block Header Analyzer")
-    st.caption("Latest Bitcoin block header parsed from raw bytes and verified locally.")
+    module_header(
+        "Module 2",
+        "Block Header Analyzer",
+        "The latest 80-byte Bitcoin header is parsed field by field and verified locally with double SHA-256.",
+    )
 
     try:
         latest_block, header = load_latest_header()
     except BlockchainApiError as exc:
-        st.error(f"Could not load the latest block header: {exc}")
+        st.error(f"Could not load the latest block header after trying the configured public APIs: {exc}")
         return
     except Exception as exc:
         st.error(f"Unexpected error while verifying the block header: {exc}")

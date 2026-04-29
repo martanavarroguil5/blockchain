@@ -25,6 +25,16 @@ def human_hash_rate(hash_rate_hs: float) -> str:
     return f"{value:,.2f} ZH/s"
 
 
+def human_difficulty(difficulty: float) -> str:
+    units = ["", "K", "M", "B", "T", "P"]
+    value = float(difficulty)
+    for unit in units:
+        if abs(value) < 1000 or unit == units[-1]:
+            return f"{value:,.2f} {unit}".strip()
+        value /= 1000
+    return f"{value:,.2f} P"
+
+
 def leading_zero_bits(value: int, width: int = 256) -> int:
     if value <= 0:
         return width

@@ -12,9 +12,11 @@ from api.blockchain_client import BlockchainApiError, get_client
 from modules.bitcoin_math import (
     bits_to_target,
     estimate_hash_rate_hs,
+    human_difficulty,
     human_hash_rate,
     leading_zero_bits,
 )
+from modules.ui import module_header, style_chart
 
 
 @st.cache_data(ttl=60, show_spinner=False)
@@ -43,13 +45,16 @@ def load_pow_snapshot(block_limit: int = 40) -> dict[str, object]:
 
 def render_m1() -> None:
     st_autorefresh(interval=60_000, key="m1_autorefresh")
-    st.subheader("M1 - Proof of Work Monitor")
-    st.caption("Live Bitcoin mining metrics from Blockstream. Auto-refresh every 60 seconds.")
+    module_header(
+        "Module 1",
+        "Proof of Work Monitor",
+        "Live mining metrics, target threshold, estimated hash rate, and recent block timing behavior.",
+    )
 
     try:
         snapshot = load_pow_snapshot()
     except BlockchainApiError as exc:
-        st.error(f"Could not load blockchain data: {exc}")
+        st.error(f"Could not load blockchain data after trying the configured public APIs: {exc}")
         return
     except Exception as exc:
         st.error(f"Unexpected error while building M1: {exc}")
@@ -62,11 +67,11 @@ def render_m1() -> None:
         return
 
     now_utc = datetime.now(UTC).strftime("%Y-%m-%d %H:%M:%S UTC")
-    st.write(f"Snapshot generated at {now_utc}.")
+    st.caption(f"Snapshot generated at {now_utc}. Auto-refresh interval: 60 seconds.")
 
     metric_col_1, metric_col_2, metric_col_3, metric_col_4 = st.columns(4)
     metric_col_1.metric("Latest block height", f"{int(latest_block['height']):,}")
-    metric_col_2.metric("Difficulty", f"{float(latest_block['difficulty']):,.2f}")
+    metric_col_2.metric("Difficulty", human_difficulty(float(latest_block["difficulty"])))
     metric_col_3.metric("Estimated hash rate", human_hash_rate(float(snapshot["hash_rate_hs"])))
     metric_col_4.metric("Transactions", f"{int(latest_block['tx_count']):,}")
 
@@ -93,7 +98,7 @@ def render_m1() -> None:
             labels={"minutes_since_prev": "Minutes between blocks"},
         )
         interval_fig.update_layout(bargap=0.08)
-        st.plotly_chart(interval_fig, width="stretch")
+        st.plotly_chart(style_chart(interval_fig, height=420), width="stretch")
 
     with stats_col:
         st.markdown("#### Inter-block timing stats")
@@ -122,7 +127,7 @@ def render_m1() -> None:
         line_color="firebrick",
         annotation_text="10-minute target",
     )
-    st.plotly_chart(trend_fig, width="stretch")
+    st.plotly_chart(style_chart(trend_fig, height=430), width="stretch")
 
     st.markdown("#### Latest block summary")
     st.json(

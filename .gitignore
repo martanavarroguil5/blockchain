@@ -11,3 +11,4 @@ env/
 .mypy_cache/
 
 *.log
+ui-dashboard*.png

@@ -7,6 +7,8 @@ import plotly.express as px
 import streamlit as st
 
 from api.blockchain_client import BlockchainApiError, get_client
+from modules.bitcoin_math import human_difficulty
+from modules.ui import module_header, style_chart
 
 
 BLOCKS_PER_ADJUSTMENT = 2016
@@ -57,8 +59,11 @@ def load_difficulty_periods(periods: int = 8) -> pd.DataFrame:
 
 
 def render_m3() -> None:
-    st.subheader("M3 - Difficulty History")
-    st.caption("Completed Bitcoin difficulty adjustment periods from live Blockstream data.")
+    module_header(
+        "Module 3",
+        "Difficulty History",
+        "Recent Bitcoin adjustment periods, difficulty evolution, and actual timing compared with the 600-second target.",
+    )
 
     period_count = st.slider(
         "Adjustment periods",
@@ -72,7 +77,7 @@ def render_m3() -> None:
     try:
         periods_df = load_difficulty_periods(period_count)
     except BlockchainApiError as exc:
-        st.error(f"Could not load difficulty history: {exc}")
+        st.error(f"Could not load difficulty history after trying the configured public APIs: {exc}")
         return
     except Exception as exc:
         st.error(f"Unexpected error while building difficulty history: {exc}")
@@ -85,7 +90,7 @@ def render_m3() -> None:
     latest_row = periods_df.iloc[-1]
     metric_col_1, metric_col_2, metric_col_3 = st.columns(3)
     metric_col_1.metric("Latest completed period", f"{int(latest_row['period_index']):,}")
-    metric_col_2.metric("Latest period difficulty", f"{float(latest_row['difficulty']):,.2f}")
+    metric_col_2.metric("Latest period difficulty", human_difficulty(float(latest_row["difficulty"])))
     metric_col_3.metric(
         "Latest avg block time",
         f"{float(latest_row['average_block_minutes']):.2f} min",
@@ -105,7 +110,7 @@ def render_m3() -> None:
     )
     for row in periods_df.itertuples():
         difficulty_fig.add_vline(x=row.period_start, line_dash="dot", line_color="rgba(80,80,80,0.35)")
-    st.plotly_chart(difficulty_fig, width="stretch")
+    st.plotly_chart(style_chart(difficulty_fig, height=430), width="stretch")
 
     ratio_fig = px.bar(
         periods_df,
@@ -130,7 +135,7 @@ def render_m3() -> None:
         line_color="firebrick",
         annotation_text="Target duration",
     )
-    st.plotly_chart(ratio_fig, width="stretch")
+    st.plotly_chart(style_chart(ratio_fig, height=420), width="stretch")
 
     st.markdown("#### Adjustment period table")
     display_df = periods_df.copy()

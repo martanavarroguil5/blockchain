@@ -6,6 +6,7 @@ from modules.m1_pow_monitor import render_m1
 from modules.m2_block_header import render_m2
 from modules.m3_difficulty_history import render_m3
 from modules.m4_ai_anomaly import render_m4
+from modules.ui import apply_app_theme, hero, insight_grid
 
 
 st.set_page_config(
@@ -14,50 +15,67 @@ st.set_page_config(
     layout="wide",
 )
 
-st.title("CryptoChain Analyzer Dashboard")
-st.caption(
-    "Bitcoin live metrics, proof-of-work verification, difficulty history, and AI-driven analysis."
-)
+apply_app_theme()
+hero()
 
 with st.sidebar:
     st.header("Project Status")
+    st.markdown("**Student:** Marta Navarro")
+    st.markdown("**Project:** Bitcoin Proof Explorer")
+    st.divider()
     st.markdown("- M1: operational")
     st.markdown("- M2: operational")
     st.markdown("- M3: operational")
     st.markdown("- M4: checkpoint skeleton")
-    st.info("Checkpoint 29 April: M1, M2, and M3 are visible in the dashboard.")
+    st.info("Checkpoint 29 April: core modules are visible and connected to live Bitcoin data.")
 
-overview_tab, m1_tab, m2_tab, m3_tab, m4_tab = st.tabs(
+selected_page = st.radio(
+    "Dashboard section",
     [
         "Overview",
         "M1 Proof of Work",
         "M2 Block Header",
         "M3 Difficulty History",
         "M4 AI",
-    ]
+    ],
+    horizontal=True,
+    label_visibility="collapsed",
 )
 
-with overview_tab:
-    st.subheader("Roadmap")
-    st.markdown(
-        """
-        1. Connect to live Bitcoin APIs.
-        2. Build the Proof of Work monitor.
-        3. Verify the latest block header locally.
-        4. Plot difficulty adjustment history.
-        5. Add the anomaly detector and evaluate it.
-        """
+if selected_page == "Overview":
+    st.subheader("Checkpoint Overview")
+    insight_grid(
+        [
+            ("Core status", "3 / 3", "M1, M2, and M3 are operational for the checkpoint."),
+            ("Live source", "API fallback", "The dashboard uses Blockstream first and Mempool.space if a rate limit appears."),
+            ("AI direction", "Anomaly detection", "M4 uses block interval outliers as the selected analytical approach."),
+        ]
     )
-    st.success("Base project structure is ready.")
+    st.markdown("#### Delivery roadmap")
+    st.dataframe(
+        {
+            "Module": ["M1", "M2", "M3", "M4"],
+            "Checkpoint result": [
+                "Live mining metrics and block interval charts",
+                "Local double SHA-256 header verification",
+                "Difficulty adjustment history and timing ratio",
+                "Anomaly detector skeleton with live preview",
+            ],
+            "Status": ["Operational", "Operational", "Operational", "Skeleton"],
+        },
+        width="stretch",
+        hide_index=True,
+    )
+    st.success("The project is aligned with the 29 April checkpoint requirements.")
 
-with m1_tab:
+elif selected_page == "M1 Proof of Work":
     render_m1()
 
-with m2_tab:
+elif selected_page == "M2 Block Header":
     render_m2()
 
-with m3_tab:
+elif selected_page == "M3 Difficulty History":
     render_m3()
 
-with m4_tab:
+elif selected_page == "M4 AI":
     render_m4()

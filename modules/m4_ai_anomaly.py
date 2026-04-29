@@ -6,6 +6,7 @@ import plotly.express as px
 import streamlit as st
 
 from api.blockchain_client import BlockchainApiError, get_client
+from modules.ui import module_header, style_chart
 
 
 @st.cache_data(ttl=300, show_spinner=False)
@@ -28,8 +29,11 @@ def load_anomaly_preview(block_limit: int = 120) -> pd.DataFrame:
 
 
 def render_m4() -> None:
-    st.subheader("M4 - AI Anomaly Detector")
-    st.caption("Checkpoint skeleton: selected approach, live feature pipeline, and baseline anomaly preview.")
+    module_header(
+        "Module 4",
+        "AI Anomaly Detector",
+        "Checkpoint skeleton with the selected model direction, live block interval features, and a z-score baseline preview.",
+    )
 
     st.markdown("#### Selected AI approach")
     st.write(
@@ -40,7 +44,7 @@ def render_m4() -> None:
     try:
         blocks_df = load_anomaly_preview()
     except BlockchainApiError as exc:
-        st.error(f"Could not load data for the AI module skeleton: {exc}")
+        st.error(f"Could not load data for the AI module skeleton after trying the configured public APIs: {exc}")
         return
     except Exception as exc:
         st.error(f"Unexpected error in the AI module skeleton: {exc}")
@@ -75,7 +79,7 @@ def render_m4() -> None:
         line_color="firebrick",
         annotation_text="10-minute target",
     )
-    st.plotly_chart(fig, width="stretch")
+    st.plotly_chart(style_chart(fig, height=430), width="stretch")
 
     st.markdown("#### Final model plan")
     st.dataframe(
