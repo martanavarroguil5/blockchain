@@ -1,1 +1,1 @@
-"""Dashboard modules for the CryptoChain Analyzer project."""
+"""Dashboard modules for the ProofLab Bitcoin project."""

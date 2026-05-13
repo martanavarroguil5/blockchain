@@ -1,34 +1,37 @@
-# CryptoChain Analyzer Dashboard
+# ProofLab Bitcoin
 
 ## Student Information
 - Name: Marta Navarro
 - GitHub username: martanavarroguil5
 
 ## Project Title
-Bitcoin Proof Explorer
+ProofLab Bitcoin: una visita guiada por la prueba de trabajo
 
 ## Chosen AI Approach
-Statistical anomaly detection for unusual Bitcoin block inter-arrival times. The first version will use z-scores as an interpretable baseline, then compare it with an Isolation Forest model trained on historical block timing features.
+Statistical anomaly detection for unusual Bitcoin block inter-arrival times. The dashboard uses z-scores as an interpretable baseline and compares them with an Isolation Forest model trained on recent historical block timing features.
+
+The app is now designed as a guided explanation rather than a collection of isolated technical answers: it starts from live Bitcoin data, verifies one real block header locally, explains difficulty adjustment, and then uses the timing context as input for the AI module.
 
 ## Module Tracking
-- M1 Proof of Work Monitor: Operational - live Blockstream data, proof-of-work target, estimated hash rate, and recent block interval charts are implemented.
-- M2 Block Header Analyzer: Operational - the latest 80-byte header is parsed, all six fields are displayed, and Proof of Work is verified locally with hashlib.
-- M3 Difficulty History: Operational - recent 2016-block adjustment periods are loaded from the API, plotted, and compared against the 600-second target.
-- M4 AI Component: Checkpoint skeleton - anomaly detection approach selected with a live z-score preview; final Isolation Forest evaluation is pending.
+- M1 Red en directo: Operativo - usa datos live de Blockstream, objetivo de proof-of-work, hash rate estimado y graficas de intervalos con notas explicativas.
+- M2 Header: Operativo - parsea el header de 80 bytes, explica sus seis campos y verifica el Proof of Work localmente con hashlib.
+- M3 Dificultad: Operativo - carga periodos recientes de ajuste de 2016 bloques, los grafica y los interpreta frente al objetivo de 600 segundos.
+- M4 IA: Operativo - genera features temporales live, calcula un baseline z-score y usa Isolation Forest para ordenar candidatos anomalos.
 - M5-M7 Optional Modules: Not selected yet.
 
 ## Current Progress
 - Repository cloned and connected to GitHub with the expected classroom structure.
 - First API script completed with live Bitcoin data from Blockstream.
-- Streamlit dashboard created with automatic refresh and tabs for M1, M2, M3, and M4.
+- Streamlit dashboard rebranded as ProofLab Bitcoin with a clearer visual hierarchy and Spanish explanatory copy.
 - M1, M2, and M3 are operational for the 29 April checkpoint.
-- M4 has a documented anomaly detection skeleton with live feature preview.
+- M4 is now implemented as a final AI module with live feature engineering, unsupervised model training, baseline comparison, and an anomaly candidate table.
 
 ## Next Step
-- Complete M4 by training and evaluating the Isolation Forest anomaly detector on a larger historical block sample.
+- Run the Streamlit app, review the final visual presentation, capture screenshots, and prepare the repository for submission.
 
 ## Main Problem or Blocker
-- No major blocker right now. The remaining challenge is building a clear evaluation for the final AI model.
+- No major blocker right now. M4 is unsupervised, so the evaluation reports anomaly rate, agreement with statistical tail thresholds, and ranked candidate inspection instead of supervised accuracy.
+- The main design goal is clarity for a reviewer who has not built the project: each module now explains what the viewer is seeing, why it matters, and how to interpret the result.
 
 ## How to Run
 ```bash

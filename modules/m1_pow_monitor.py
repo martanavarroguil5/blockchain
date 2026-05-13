@@ -16,7 +16,7 @@ from modules.bitcoin_math import (
     human_hash_rate,
     leading_zero_bits,
 )
-from modules.ui import module_header, style_chart
+from modules.ui import metric_explainer_grid, module_header, story_panel, style_chart, takeaway
 
 
 @st.cache_data(ttl=60, show_spinner=False)
@@ -46,90 +46,159 @@ def load_pow_snapshot(block_limit: int = 40) -> dict[str, object]:
 def render_m1() -> None:
     st_autorefresh(interval=60_000, key="m1_autorefresh")
     module_header(
-        "Module 1",
-        "Proof of Work Monitor",
-        "Live mining metrics, target threshold, estimated hash rate, and recent block timing behavior.",
+        "Red en directo",
+        "La red Bitcoin ahora mismo",
+        "Metricas en directo para entender cuanto trabajo exige minar un bloque hoy.",
     )
 
     try:
         snapshot = load_pow_snapshot()
     except BlockchainApiError as exc:
-        st.error(f"Could not load blockchain data after trying the configured public APIs: {exc}")
+        st.error(f"No se pudieron cargar los datos publicos de Bitcoin: {exc}")
         return
     except Exception as exc:
-        st.error(f"Unexpected error while building M1: {exc}")
+        st.error(f"Error inesperado al preparar esta vista: {exc}")
         return
 
     latest_block = snapshot["latest_block"]
     recent_blocks = snapshot["recent_blocks"]
     if not isinstance(latest_block, dict) or not isinstance(recent_blocks, pd.DataFrame):
-        st.error("Unexpected data format returned by the blockchain client.")
+        st.error("La fuente de datos devolvio un formato inesperado.")
         return
 
     now_utc = datetime.now(UTC).strftime("%Y-%m-%d %H:%M:%S UTC")
-    st.caption(f"Snapshot generated at {now_utc}. Auto-refresh interval: 60 seconds.")
+    st.caption(f"Instantanea generada a las {now_utc}. Actualizacion automatica: 60 segundos.")
+    story_panel(
+        "Antes de mirar numeros",
+        "Que indican estas metricas",
+        "Esta pantalla resume el estado actual de Bitcoin. La altura dice cual es el ultimo bloque aceptado; "
+        "la dificultad indica lo exigente que es encontrar un hash valido; el hash rate estima cuanta potencia de calculo "
+        "esta compitiendo en la red; y las transacciones muestran cuanta actividad se incluyo en ese bloque. "
+        "Juntas, estas cifras permiten ver si la red avanza con normalidad y cuanto trabajo sostiene cada bloque.",
+    )
 
-    metric_col_1, metric_col_2, metric_col_3, metric_col_4 = st.columns(4)
-    metric_col_1.metric("Latest block height", f"{int(latest_block['height']):,}")
-    metric_col_2.metric("Difficulty", human_difficulty(float(latest_block["difficulty"])))
-    metric_col_3.metric("Estimated hash rate", human_hash_rate(float(snapshot["hash_rate_hs"])))
-    metric_col_4.metric("Transactions", f"{int(latest_block['tx_count']):,}")
+    metric_explainer_grid(
+        [
+            (
+                "Ultima altura",
+                f"{int(latest_block['height']):,}",
+                "Numero del ultimo bloque aceptado por la red; indica hasta donde ha avanzado Bitcoin.",
+            ),
+            (
+                "Dificultad",
+                human_difficulty(float(latest_block["difficulty"])),
+                "Multiplicador frente al nivel base: 134 T significa unas 134 billones de veces mas intentos de media.",
+            ),
+            (
+                "Hash rate estimado",
+                human_hash_rate(float(snapshot["hash_rate_hs"])),
+                "Potencia de calculo aproximada compitiendo en la red; mas alta implica mas seguridad economica.",
+            ),
+            (
+                "Transacciones",
+                f"{int(latest_block['tx_count']):,}",
+                "Operaciones incluidas en el ultimo bloque; resume la actividad confirmada en esa pieza.",
+            ),
+        ]
+    )
 
     target_hex = str(snapshot["target_hex"])
-    st.markdown("#### Difficulty as a SHA-256 target threshold")
+    st.markdown("#### La dificultad convertida en objetivo")
+    st.write(
+        "La dificultad acaba traduciendose en un numero objetivo. Un hash valido tiene que ser menor que ese numero. "
+        "Cuanto mas pequeño es el objetivo, menor es el espacio de hashes aceptables."
+    )
     st.code(target_hex, language="text")
     st.write(
-        f"The compact `bits` field is `{int(latest_block['bits'])}`. "
-        f"It expands to a 256-bit target with approximately `{int(snapshot['target_leading_zero_bits'])}` leading zero bits."
+        f"El campo compacto `bits` del bloque es `{int(latest_block['bits'])}`. "
+        f"Al expandirlo se obtiene un objetivo de 256 bits con aproximadamente `{int(snapshot['target_leading_zero_bits'])}` bits iniciales a cero."
     )
 
     clean_intervals = recent_blocks["minutes_since_prev"].dropna()
     if clean_intervals.empty:
-        st.warning("Not enough recent blocks were loaded to compute inter-block times.")
+        st.info("Todavia no hay suficientes bloques recientes para calcular intervalos.")
         return
 
     interval_col, stats_col = st.columns([2, 1])
     with interval_col:
+        st.markdown("#### Como se estan espaciando los bloques")
+        st.write(
+            "Bitcoin apunta a 10 minutos de media, pero no promete 10 minutos exactos. "
+            "Este histograma muestra si los ultimos bloques se han concentrado cerca del objetivo o si han tenido esperas muy dispersas."
+        )
         interval_fig = px.histogram(
             recent_blocks.dropna(subset=["minutes_since_prev"]),
             x="minutes_since_prev",
             nbins=15,
-            title="Distribution of time between recent blocks",
-            labels={"minutes_since_prev": "Minutes between blocks"},
+            title="Distribucion del tiempo entre bloques recientes",
+            labels={"minutes_since_prev": "Minutos entre bloques"},
         )
+        interval_fig.update_traces(
+            marker_color="#0B7285",
+            marker_line_color="rgba(255,255,255,0.9)",
+            marker_line_width=1.1,
+            hovertemplate=(
+                "<b>Intervalos agrupados</b><br>"
+                "Minutos: %{x:.2f}<br>"
+                "Bloques en el rango: %{y}"
+                "<extra></extra>"
+            ),
+        )
+        interval_fig.update_yaxes(title_text="Bloques")
         interval_fig.update_layout(bargap=0.08)
-        st.plotly_chart(style_chart(interval_fig, height=420), width="stretch")
+        st.plotly_chart(style_chart(interval_fig, height=420), width="stretch", config={"displayModeBar": False})
 
     with stats_col:
-        st.markdown("#### Inter-block timing stats")
-        st.metric("Mean interval", f"{clean_intervals.mean():.2f} min")
-        st.metric("Median interval", f"{clean_intervals.median():.2f} min")
-        st.metric("Std. deviation", f"{clean_intervals.std(ddof=1):.2f} min")
-        st.metric("Coeff. of variation", f"{(clean_intervals.std(ddof=1) / clean_intervals.mean()):.2f}")
+        st.markdown("#### Resumen temporal")
+        st.metric("Media", f"{clean_intervals.mean():.2f} min")
+        st.metric("Mediana", f"{clean_intervals.median():.2f} min")
+        st.metric("Desviacion tipica", f"{clean_intervals.std(ddof=1):.2f} min")
+        st.metric("Coef. variacion", f"{(clean_intervals.std(ddof=1) / clean_intervals.mean()):.2f}")
         st.info(
-            "Bitcoin block arrivals are usually modeled as a Poisson process, so inter-arrival times are expected to follow an exponential distribution."
+            "Los bloques suelen modelarse como un proceso aleatorio: lo normal no es una linea perfecta, sino una distribucion de esperas."
         )
 
+    trend_df = recent_blocks.dropna(subset=["minutes_since_prev"]).copy()
+    trend_df["timestamp_label"] = trend_df["timestamp_dt"].dt.strftime("%Y-%m-%d %H:%M UTC")
     trend_fig = px.line(
-        recent_blocks.dropna(subset=["minutes_since_prev"]),
+        trend_df,
         x="timestamp_dt",
         y="minutes_since_prev",
         markers=True,
-        title="Recent block intervals over time",
+        title="Intervalos recientes a lo largo del tiempo",
         labels={
-            "timestamp_dt": "Block timestamp (UTC)",
-            "minutes_since_prev": "Minutes since previous block",
+            "timestamp_dt": "Timestamp del bloque (UTC)",
+            "minutes_since_prev": "Minutos desde el bloque anterior",
         },
+        custom_data=["height", "timestamp_label", "minutes_since_prev"],
+    )
+    trend_fig.update_traces(
+        line={"width": 2.8, "color": "#0B7285"},
+        marker={"size": 8, "color": "#364FC7", "line": {"width": 1.6, "color": "#ffffff"}},
+        hovertemplate=(
+            "<b>Bloque %{customdata[0]:,}</b><br>"
+            "Fecha: %{customdata[1]}<br>"
+            "Intervalo: %{customdata[2]:.2f} min<br>"
+            "Objetivo: 10.00 min"
+            "<extra></extra>"
+        ),
     )
     trend_fig.add_hline(
         y=10,
         line_dash="dash",
-        line_color="firebrick",
-        annotation_text="10-minute target",
+        line_color="#0B7285",
+        annotation_text="Objetivo 10 min",
     )
-    st.plotly_chart(style_chart(trend_fig, height=430), width="stretch")
+    st.plotly_chart(style_chart(trend_fig, height=430), width="stretch", config={"displayModeBar": False})
+    st.write(
+        "Los puntos por encima de la linea tardaron mas de 10 minutos; los de debajo llegaron mas rapido. "
+        "Una racha corta no es un problema: el ajuste de dificultad es el mecanismo que corrige desviaciones sostenidas."
+    )
 
-    st.markdown("#### Latest block summary")
+    st.markdown("#### Bloque usado como referencia")
+    st.write(
+        "Este resumen conecta las metricas con un bloque real. El hash y el campo `bits` son las piezas que se verifican con mas detalle en la seccion del bloque."
+    )
     st.json(
         {
             "hash": latest_block["id"],
@@ -144,14 +213,26 @@ def render_m1() -> None:
     avg_interval_seconds = clean_intervals.mean() * 60
     deviation_ratio = avg_interval_seconds / 600
     st.write(
-        "Observed average over the recent sample: "
-        f"`{avg_interval_seconds:.1f}` seconds per block, "
-        f"which is `{deviation_ratio:.2f}x` the ideal 600-second target."
+        "Promedio observado en la muestra reciente: "
+        f"`{avg_interval_seconds:.1f}` segundos por bloque, "
+        f"es decir `{deviation_ratio:.2f}x` el objetivo ideal de 600 segundos."
     )
 
     if np.isfinite(deviation_ratio) and deviation_ratio > 1.25:
-        st.warning("Recent block production is slower than the long-run Bitcoin target.")
+        takeaway(
+            "La muestra reciente va lenta.",
+            "El promedio reciente esta bastante por encima del objetivo. Si una situacion asi se mantuviera durante un periodo completo, la red tenderia a bajar la dificultad.",
+            tone="warning",
+        )
     elif np.isfinite(deviation_ratio) and deviation_ratio < 0.75:
-        st.warning("Recent block production is faster than the long-run Bitcoin target.")
+        takeaway(
+            "La muestra reciente va rapida.",
+            "El promedio reciente esta bastante por debajo del objetivo. Si se mantuviera, la red tenderia a subir la dificultad.",
+            tone="warning",
+        )
     else:
-        st.success("Recent block production is reasonably close to the long-run 10-minute target.")
+        takeaway(
+            "La muestra reciente esta cerca del objetivo.",
+            "Aunque los bloques individuales varien, el promedio observado no se aleja demasiado de los 10 minutos por bloque.",
+            tone="success",
+        )
