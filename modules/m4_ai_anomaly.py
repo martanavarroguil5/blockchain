@@ -6,7 +6,7 @@ import plotly.express as px
 import streamlit as st
 
 from api.blockchain_client import BlockchainApiError, get_client
-from modules.ui import concept_flow, module_header, story_panel, style_chart, styled_table, takeaway
+from modules.ui import anomaly_card_grid, concept_flow, module_header, story_panel, style_chart, styled_table, takeaway
 
 
 TARGET_BLOCK_MINUTES = 10.0
@@ -95,6 +95,40 @@ def run_isolation_forest(blocks_df: pd.DataFrame, contamination: float) -> pd.Da
 
 def _format_percent(value: float) -> str:
     return f"{value * 100:.1f}%"
+
+
+def _explain_anomaly(row: pd.Series) -> tuple[str, str, list[str]]:
+    interval = float(row["minutes_since_prev"])
+    deviation = float(row["absolute_target_deviation"])
+    z_score = float(row["z_score"])
+    rolling_z = float(row["rolling_z_score"])
+    score = float(row["isolation_score"])
+
+    if interval >= TARGET_BLOCK_MINUTES * 2:
+        title = "Espera larga entre bloques"
+        core = (
+            f"Este bloque llego tras {interval:.2f} minutos, mas del doble del objetivo de 10 minutos. "
+            "No implica que el bloque sea invalido, pero si marca una espera poco comoda para la red."
+        )
+    elif interval <= TARGET_BLOCK_MINUTES * 0.35:
+        title = "Bloque muy rapido"
+        core = (
+            f"Este bloque aparecio en {interval:.2f} minutos. Puede pasar por azar, pero el modelo lo revisa porque se aleja bastante del ritmo esperado."
+        )
+    else:
+        title = "Rareza contextual"
+        core = (
+            f"El intervalo fue de {interval:.2f} minutos. No parece extremo por si solo, pero combinado con el contexto reciente el modelo lo considera raro."
+        )
+
+    reasons = [
+        f"Desvio frente al objetivo: {deviation:.2f} minutos.",
+        f"z-score global: {z_score:.2f}; z-score local: {rolling_z:.2f}.",
+        f"Score Isolation Forest: {score:.4f}; cuanto menor, mas raro para el modelo.",
+    ]
+    if bool(row.get("negative_timestamp_jump", False)):
+        reasons.append("El timestamp retrocede respecto al bloque anterior, por eso merece revision adicional.")
+    return title, core, reasons
 
 
 def render_m4() -> None:
@@ -305,11 +339,25 @@ def render_m4() -> None:
     st.write(
         "La tabla se ordena por `isolation_score`. Cuanto menor es el score, mas raro le parece el caso al modelo; por eso las primeras filas son las mas interesantes."
     )
+    story_panel(
+        "Antes de leer la tabla",
+        "Que significan los indicadores de rareza",
+        "El `z-score` mide cuanto se separa un intervalo de lo normal: valores grandes en positivo o negativo indican esperas poco habituales. "
+        "El `z-score local` hace una comparacion parecida, pero usando el contexto cercano de bloques recientes. "
+        "El `Score IA` viene de Isolation Forest: no es una probabilidad, sino una puntuacion de rareza; cuanto mas bajo, mas sospechoso le parece al modelo.",
+        [
+            "Un candidato no significa ataque ni bloque invalido.",
+            "Significa que ese intervalo merece explicarse o revisarse antes que otros.",
+            "La lectura humana traduce esos numeros a una frase defendible para la presentacion.",
+        ],
+    )
     anomaly_table = results_df.loc[results_df["model_anomaly"]].copy()
     if anomaly_table.empty:
         st.success("La muestra actual no ha producido candidatos de anomalia.")
     else:
-        anomaly_table = anomaly_table.sort_values("isolation_score").head(12)
+        anomaly_table = anomaly_table.sort_values("isolation_score")
+        explanation_candidates = anomaly_table.head(3).copy()
+        anomaly_table = anomaly_table.head(12)
         anomaly_table["timestamp_dt"] = anomaly_table["timestamp_dt"].dt.strftime("%Y-%m-%d %H:%M UTC")
         anomaly_table["hash_corto"] = anomaly_table["id"].astype(str).str.slice(0, 6) + "..." + anomaly_table["id"].astype(str).str.slice(-6)
         anomaly_table["minutes_since_prev"] = anomaly_table["minutes_since_prev"].map(lambda value: f"{float(value):.2f} min")
@@ -339,6 +387,22 @@ def render_m4() -> None:
                 ]
             ]
         )
+        st.markdown("#### Lectura humana de los candidatos")
+        st.write(
+            "Estas fichas traducen la salida del modelo a una explicacion defendible: que paso, por que llama la atencion y que dato conviene mirar."
+        )
+        anomaly_cards: list[tuple[str, str, str, list[str]]] = []
+        for _, candidate in explanation_candidates.iterrows():
+            title, body, reasons = _explain_anomaly(candidate)
+            anomaly_cards.append(
+                (
+                    f"Bloque {int(candidate['height']):,}",
+                    title,
+                    body,
+                    reasons,
+                )
+            )
+        anomaly_card_grid(anomaly_cards)
 
     st.markdown("#### Resultado del modelo")
     styled_table(

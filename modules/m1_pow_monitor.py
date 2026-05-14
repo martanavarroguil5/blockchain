@@ -16,7 +16,7 @@ from modules.bitcoin_math import (
     human_hash_rate,
     leading_zero_bits,
 )
-from modules.ui import metric_explainer_grid, module_header, story_panel, style_chart, takeaway
+from modules.ui import health_grid, metric_explainer_grid, module_header, story_panel, style_chart, takeaway
 
 
 @st.cache_data(ttl=60, show_spinner=False)
@@ -41,6 +41,24 @@ def load_pow_snapshot(block_limit: int = 40) -> dict[str, object]:
         "target_leading_zero_bits": leading_zero_bits(target),
         "hash_rate_hs": hash_rate_hs,
     }
+
+
+def _classify_interval_health(deviation_ratio: float) -> tuple[str, str]:
+    if not np.isfinite(deviation_ratio):
+        return "Sin datos", "watch"
+    if 0.80 <= deviation_ratio <= 1.20:
+        return "Normal", "good"
+    if 0.60 <= deviation_ratio <= 1.45:
+        return "Vigilar", "watch"
+    return "Tension", "risk"
+
+
+def _classify_activity(tx_count: int) -> tuple[str, str]:
+    if tx_count >= 2_000:
+        return "Alta", "good"
+    if tx_count >= 500:
+        return "Media", "watch"
+    return "Baja", "risk"
 
 
 def render_m1() -> None:
@@ -102,6 +120,52 @@ def render_m1() -> None:
         ]
     )
 
+    clean_intervals = recent_blocks["minutes_since_prev"].dropna()
+    if not clean_intervals.empty:
+        avg_interval_seconds = clean_intervals.mean() * 60
+        deviation_ratio = avg_interval_seconds / 600
+        interval_status, interval_tone = _classify_interval_health(deviation_ratio)
+        activity_status, activity_tone = _classify_activity(int(latest_block["tx_count"]))
+        st.markdown("#### Semaforo de salud de la red")
+        st.write(
+            "Este resumen traduce las metricas principales a una lectura rapida. No emite una alerta definitiva: sirve para saber que mirar primero."
+        )
+        story_panel(
+            "Como leerlo",
+            "El semaforo no dice si Bitcoin esta bien o mal en absoluto.",
+            "Resume señales concretas de esta muestra reciente. `Normal` significa que el dato esta cerca de lo esperado; "
+            "`Vigilar` indica que se aleja un poco; `Tension` marca una desviacion mas fuerte. En dificultad y hash rate, la lectura es descriptiva: "
+            "sirve para entender cuanto trabajo computacional sostiene la red en este momento.",
+        )
+        health_grid(
+            [
+                (
+                    "Ritmo de bloques",
+                    interval_status,
+                    f"Promedio reciente: {clean_intervals.mean():.2f} min por bloque frente al objetivo de 10 min.",
+                    interval_tone,
+                ),
+                (
+                    "Dificultad",
+                    "Objetivo duro",
+                    f"Dificultad actual: {human_difficulty(float(latest_block['difficulty']))}. Menos hashes cumplen la regla, asi que minar exige mas intentos.",
+                    "info",
+                ),
+                (
+                    "Hash rate",
+                    "Potencia estimada",
+                    f"La red esta probando alrededor de {human_hash_rate(float(snapshot['hash_rate_hs']))} en intentos de hash.",
+                    "good",
+                ),
+                (
+                    "Actividad",
+                    activity_status,
+                    f"El ultimo bloque incluyo {int(latest_block['tx_count']):,} transacciones.",
+                    activity_tone,
+                ),
+            ]
+        )
+
     target_hex = str(snapshot["target_hex"])
     st.markdown("#### La dificultad convertida en objetivo")
     st.write(
@@ -114,7 +178,6 @@ def render_m1() -> None:
         f"Al expandirlo se obtiene un objetivo de 256 bits con aproximadamente `{int(snapshot['target_leading_zero_bits'])}` bits iniciales a cero."
     )
 
-    clean_intervals = recent_blocks["minutes_since_prev"].dropna()
     if clean_intervals.empty:
         st.info("Todavia no hay suficientes bloques recientes para calcular intervalos.")
         return

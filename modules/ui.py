@@ -323,21 +323,35 @@ def apply_app_theme() -> None:
 
         [data-testid="stPlotlyChart"] {
             background:
-                linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(246, 251, 255, 0.96));
-            border: 1px solid rgba(188, 205, 216, 0.88);
-            box-shadow: 0 18px 44px rgba(15, 23, 42, 0.11);
+                linear-gradient(90deg, rgba(11, 114, 133, 0.045) 1px, transparent 1px),
+                linear-gradient(180deg, rgba(11, 114, 133, 0.04) 1px, transparent 1px),
+                linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(241, 248, 251, 0.98));
+            background-size: 34px 34px, 34px 34px, auto;
+            border: 1px solid rgba(154, 181, 195, 0.92);
+            box-shadow: 0 24px 64px rgba(15, 23, 42, 0.14);
             overflow: hidden;
-            padding: 0.45rem;
+            padding: 0.65rem;
             position: relative;
         }
 
         [data-testid="stPlotlyChart"]::before {
-            background: linear-gradient(90deg, rgba(11, 114, 133, 0.52), rgba(54, 79, 199, 0.42), transparent);
+            background: linear-gradient(90deg, #0b7285, #364fc7 44%, rgba(54, 79, 199, 0.08));
             content: "";
-            height: 3px;
+            height: 5px;
             inset: 0 0 auto;
             position: absolute;
             z-index: 1;
+        }
+
+        [data-testid="stPlotlyChart"]::after {
+            background: radial-gradient(circle, rgba(54, 79, 199, 0.09), transparent 58%);
+            content: "";
+            height: 170px;
+            pointer-events: none;
+            position: absolute;
+            right: -72px;
+            top: -82px;
+            width: 240px;
         }
 
         [data-testid="stPlotlyChart"] .js-plotly-plot .plotly .hoverlayer .hovertext path {
@@ -637,6 +651,162 @@ def apply_app_theme() -> None:
             margin-top: 0.65rem;
         }
 
+        .health-grid {
+            display: grid;
+            background:
+                radial-gradient(circle at 12% 0%, rgba(45, 212, 191, 0.16), transparent 220px),
+                linear-gradient(135deg, #071827, #073b4c 48%, #172554);
+            border: 1px solid rgba(178, 242, 255, 0.22);
+            border-radius: 8px;
+            box-shadow: 0 28px 76px rgba(15, 23, 42, 0.22);
+            gap: 0.8rem;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            margin: 0.8rem 0 1.25rem;
+            padding: 0.9rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .health-grid::before {
+            background:
+                linear-gradient(90deg, rgba(255,255,255,0.08) 1px, transparent 1px),
+                linear-gradient(180deg, rgba(255,255,255,0.07) 1px, transparent 1px);
+            background-size: 28px 28px;
+            content: "";
+            inset: 0;
+            opacity: 0.46;
+            pointer-events: none;
+            position: absolute;
+        }
+
+        .health-card {
+            background: rgba(255, 255, 255, 0.10);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            border-radius: 8px;
+            box-shadow: 0 18px 42px rgba(0, 0, 0, 0.14);
+            min-height: 145px;
+            overflow: hidden;
+            padding: 1rem 1rem 0.95rem 1.1rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .health-card::before {
+            content: "";
+            inset: 0 auto 0 0;
+            position: absolute;
+            width: 5px;
+        }
+
+        .health-card.good::before {
+            background: #51cf66;
+        }
+
+        .health-card.watch::before {
+            background: #ffd43b;
+        }
+
+        .health-card.risk::before {
+            background: #ff6b6b;
+        }
+
+        .health-card.info::before {
+            background: #74c0fc;
+        }
+
+        .health-label {
+            color: #b2f2ff;
+            font-size: 0.74rem;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .health-status {
+            color: #f8fafc;
+            font-size: 1.35rem;
+            font-weight: 860;
+            line-height: 1.18;
+            margin-top: 0.48rem;
+            text-shadow: 0 14px 28px rgba(0, 0, 0, 0.22);
+        }
+
+        .health-detail {
+            color: #dbeafe;
+            font-size: 0.9rem;
+            line-height: 1.42;
+            margin-top: 0.58rem;
+        }
+
+        .anomaly-card-grid {
+            display: grid;
+            gap: 0.95rem;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            margin: 0.85rem 0 1.2rem;
+        }
+
+        .anomaly-card {
+            background:
+                radial-gradient(circle at 100% 0%, rgba(54, 79, 199, 0.12), transparent 150px),
+                linear-gradient(135deg, #ffffff, #f6fbff);
+            border: 1px solid rgba(154, 181, 195, 0.92);
+            border-radius: 8px;
+            box-shadow: 0 20px 54px rgba(15, 23, 42, 0.13);
+            min-height: 250px;
+            overflow: hidden;
+            padding: 1.05rem 1.05rem 1rem;
+            position: relative;
+        }
+
+        .anomaly-card::before {
+            background: linear-gradient(180deg, #364fc7, #0b7285);
+            content: "";
+            inset: 0 auto 0 0;
+            position: absolute;
+            width: 5px;
+        }
+
+        .anomaly-kicker {
+            color: var(--accent);
+            font-size: 0.74rem;
+            font-weight: 840;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .anomaly-title {
+            color: var(--text);
+            font-size: 1.15rem;
+            font-weight: 840;
+            line-height: 1.22;
+            margin-top: 0.35rem;
+        }
+
+        .anomaly-body {
+            color: var(--muted);
+            font-size: 0.92rem;
+            line-height: 1.48;
+            margin-top: 0.55rem;
+        }
+
+        .anomaly-list {
+            list-style: none;
+            margin: 0.75rem 0 0;
+            padding: 0;
+        }
+
+        .anomaly-list li {
+            background: rgba(231, 246, 248, 0.76);
+            border: 1px solid rgba(123, 199, 209, 0.30);
+            border-radius: 8px;
+            color: #334155;
+            font-size: 0.86rem;
+            line-height: 1.38;
+            margin-top: 0.42rem;
+            padding: 0.48rem 0.58rem;
+        }
+
         .story-panel,
         .takeaway-panel {
             background:
@@ -881,6 +1051,37 @@ def metric_explainer_grid(items: list[tuple[str, str, str]]) -> None:
     st.markdown(f'<div class="metric-explainer-grid">{cards}</div>', unsafe_allow_html=True)
 
 
+def health_grid(items: list[tuple[str, str, str, str]]) -> None:
+    cards = "".join(
+        (
+            f'<article class="health-card {escape(tone)}">'
+            f'<div class="health-label">{escape(label)}</div>'
+            f'<div class="health-status">{escape(status)}</div>'
+            f'<div class="health-detail">{escape(detail)}</div>'
+            "</article>"
+        )
+        for label, status, detail, tone in items
+    )
+    st.markdown(f'<div class="health-grid">{cards}</div>', unsafe_allow_html=True)
+
+
+def anomaly_card_grid(items: list[tuple[str, str, str, list[str]]]) -> None:
+    cards = "".join(
+        (
+            '<article class="anomaly-card">'
+            f'<div class="anomaly-kicker">{escape(kicker)}</div>'
+            f'<div class="anomaly-title">{escape(title)}</div>'
+            f'<div class="anomaly-body">{escape(body)}</div>'
+            '<ul class="anomaly-list">'
+            + "".join(f"<li>{escape(reason)}</li>" for reason in reasons)
+            + "</ul>"
+            "</article>"
+        )
+        for kicker, title, body, reasons in items
+    )
+    st.markdown(f'<div class="anomaly-card-grid">{cards}</div>', unsafe_allow_html=True)
+
+
 def story_panel(kicker: str, title: str, body: str, bullets: list[str] | None = None) -> None:
     bullet_html = ""
     if bullets:
@@ -937,7 +1138,7 @@ def style_chart(fig: go.Figure, *, height: int | None = None) -> go.Figure:
         dragmode=False,
         font={"family": "Inter, Segoe UI, Arial, sans-serif", "color": "#0f172a"},
         paper_bgcolor="rgba(0,0,0,0)",
-        plot_bgcolor="rgba(255,255,255,0.70)",
+        plot_bgcolor="rgba(248,251,253,0.92)",
         margin={"l": 46, "r": 26, "t": 78, "b": 52},
         title={
             "font": {"size": 17, "color": "#172033", "family": "Inter, Segoe UI, Arial, sans-serif"},
@@ -963,7 +1164,7 @@ def style_chart(fig: go.Figure, *, height: int | None = None) -> go.Figure:
             "align": "left",
             "bgcolor": "#ffffff",
             "font": {"family": "Inter, Segoe UI, Arial, sans-serif", "size": 13, "color": "#172033"},
-            "bordercolor": "#73cbd7",
+            "bordercolor": "#364fc7",
             "namelength": -1,
         },
         separators=".,",
@@ -971,7 +1172,7 @@ def style_chart(fig: go.Figure, *, height: int | None = None) -> go.Figure:
     fig.update_traces(marker_line_color="rgba(255,255,255,0.88)", marker_line_width=1.1, selector={"type": "bar"})
     fig.update_xaxes(
         showgrid=True,
-        gridcolor="rgba(226, 232, 240, 0.82)",
+        gridcolor="rgba(11, 114, 133, 0.10)",
         linecolor="rgba(188, 205, 216, 0.78)",
         tickfont={"color": "#64748b", "size": 12},
         title_font={"color": "#596579", "size": 13},
@@ -980,7 +1181,7 @@ def style_chart(fig: go.Figure, *, height: int | None = None) -> go.Figure:
     )
     fig.update_yaxes(
         showgrid=True,
-        gridcolor="rgba(226, 232, 240, 0.82)",
+        gridcolor="rgba(11, 114, 133, 0.10)",
         linecolor="rgba(188, 205, 216, 0.78)",
         tickfont={"color": "#64748b", "size": 12},
         title_font={"color": "#596579", "size": 13},
