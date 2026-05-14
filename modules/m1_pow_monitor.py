@@ -197,7 +197,7 @@ def render_m1() -> None:
             labels={"minutes_since_prev": "Minutes between blocks"},
         )
         interval_fig.update_traces(
-            marker_color="#0B7285",
+            marker_color="#087F8C",
             marker_line_color="rgba(255,255,255,0.9)",
             marker_line_width=1.1,
             hovertemplate=(
@@ -236,8 +236,8 @@ def render_m1() -> None:
         custom_data=["height", "timestamp_label", "minutes_since_prev"],
     )
     trend_fig.update_traces(
-        line={"width": 2.8, "color": "#0B7285"},
-        marker={"size": 8, "color": "#364FC7", "line": {"width": 1.6, "color": "#ffffff"}},
+        line={"width": 2.8, "color": "#087F8C"},
+        marker={"size": 8, "color": "#4F46E5", "line": {"width": 1.6, "color": "#ffffff"}},
         hovertemplate=(
             "<b>Block %{customdata[0]:,}</b><br>"
             "Date: %{customdata[1]}<br>"
@@ -249,7 +249,7 @@ def render_m1() -> None:
     trend_fig.add_hline(
         y=10,
         line_dash="dash",
-        line_color="#0B7285",
+        line_color="#087F8C",
         annotation_text="Target 10 min",
     )
     st.plotly_chart(style_chart(trend_fig, height=430), width="stretch", config={"displayModeBar": False})

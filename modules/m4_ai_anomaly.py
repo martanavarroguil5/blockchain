@@ -245,9 +245,9 @@ def render_m4() -> None:
         color="anomaly_label",
         size="absolute_target_deviation",
         color_discrete_map={
-            "Normal": "#0B7285",
+            "Normal": "#087F8C",
             "z-score only": "#E8590C",
-            "Isolation Forest anomaly": "#364FC7",
+            "Isolation Forest anomaly": "#4F46E5",
         },
         title="Block intervals and detected anomalies",
         labels={
@@ -289,7 +289,7 @@ def render_m4() -> None:
     fig.add_hline(
         y=TARGET_BLOCK_MINUTES,
         line_dash="dash",
-        line_color="#0B7285",
+        line_color="#087F8C",
         annotation_text="10 min target",
     )
     st.plotly_chart(style_chart(fig, height=430), width="stretch", config={"displayModeBar": False})

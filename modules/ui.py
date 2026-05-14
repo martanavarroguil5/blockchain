@@ -6,7 +6,7 @@ import plotly.graph_objects as go
 import streamlit as st
 
 
-COLORWAY = ["#0B7285", "#364FC7", "#2B8A3E", "#9C36B5", "#0CA678", "#F59F00"]
+COLORWAY = ["#087F8C", "#2563EB", "#4F46E5", "#0EA5E9", "#1D4ED8", "#0F766E"]
 
 
 def apply_app_theme() -> None:
@@ -14,54 +14,80 @@ def apply_app_theme() -> None:
         """
         <style>
         :root {
-            --bg: #eef4f6;
+            --bg: #eef4f1;
             --surface: #ffffff;
-            --surface-soft: #edf7f8;
-            --ink: #0f172a;
-            --text: #172033;
-            --muted: #596579;
-            --border: #dbe4ea;
-            --primary: #0b7285;
-            --primary-dark: #075463;
-            --primary-soft: #e7f6f8;
-            --accent: #364fc7;
-            --accent-soft: #edf2ff;
-            --blue-soft: #edf2ff;
-            --success: #2b8a3e;
-            --warning: #b7791f;
-            --shadow: 0 30px 80px rgba(15, 23, 42, 0.18);
-            --shadow-lift: 0 30px 70px rgba(11, 114, 133, 0.20), 0 14px 34px rgba(15, 23, 42, 0.14);
-            --shadow-soft: 0 14px 34px rgba(15, 23, 42, 0.10);
+            --surface-soft: #f3f8f6;
+            --surface-strong: #f9fcfb;
+            --ink: #101724;
+            --text: #182235;
+            --muted: #5d687b;
+            --border: #d6e0df;
+            --border-strong: #b6c6c5;
+            --primary: #087f8c;
+            --primary-dark: #07545c;
+            --primary-soft: #e5f7f6;
+            --accent: #2563eb;
+            --accent-soft: #e0ecff;
+            --accent-2: #4f46e5;
+            --accent-2-soft: #eef2ff;
+            --success: #2563eb;
+            --warning: #1d4ed8;
+            --radius: 8px;
+            --shadow: 0 32px 78px rgba(15, 23, 42, 0.18);
+            --shadow-lift: 0 26px 58px rgba(8, 127, 140, 0.18), 0 12px 30px rgba(15, 23, 42, 0.12);
+            --shadow-soft: 0 16px 38px rgba(15, 23, 42, 0.09);
+            --shadow-hairline: inset 0 1px 0 rgba(255, 255, 255, 0.78);
         }
 
         .stApp {
             background:
-                radial-gradient(circle at 12% 6%, rgba(20, 184, 166, 0.22), transparent 330px),
-                radial-gradient(circle at 88% 8%, rgba(54, 79, 199, 0.18), transparent 420px),
-                linear-gradient(180deg, #dfecef 0, #f7fafb 320px, #eef4f6 100%),
+                linear-gradient(90deg, rgba(8, 127, 140, 0.050) 1px, transparent 1px),
+                linear-gradient(180deg, rgba(37, 99, 235, 0.045) 1px, transparent 1px),
+                linear-gradient(135deg, rgba(224, 236, 255, 0.74) 0%, rgba(232, 247, 247, 0.82) 38%, rgba(236, 242, 255, 0.88) 100%),
+                linear-gradient(180deg, #f8fbff 0, #eef4f8 100%),
                 var(--bg);
+            background-size: 34px 34px, 34px 34px, auto, auto;
             color: var(--text);
         }
 
         .block-container {
-            max-width: 1280px;
-            padding-top: 1.2rem;
-            padding-bottom: 4rem;
+            max-width: 1320px;
+            padding-top: 1.35rem;
+            padding-bottom: 4.5rem;
         }
 
         .stApp * {
             text-rendering: optimizeLegibility;
         }
 
+        .stApp a {
+            color: var(--primary-dark);
+            text-decoration-thickness: 0.08em;
+            text-underline-offset: 0.16em;
+        }
+
         [data-testid="stSidebar"] {
             background:
-                linear-gradient(180deg, #0f172a 0%, #111827 54%, #082f49 100%);
+                linear-gradient(90deg, rgba(255, 255, 255, 0.055) 1px, transparent 1px),
+                linear-gradient(180deg, rgba(255, 255, 255, 0.050) 1px, transparent 1px),
+                linear-gradient(180deg, #0b1220 0%, #102133 52%, #0f3b61 100%);
+            background-size: 22px 22px, 22px 22px, auto;
             border-right: 1px solid rgba(255, 255, 255, 0.10);
-            box-shadow: 12px 0 34px rgba(15, 23, 42, 0.16);
+            box-shadow: 18px 0 48px rgba(15, 23, 42, 0.20);
         }
 
         [data-testid="stSidebar"] * {
             color: #e5eef8;
+        }
+
+        [data-testid="stSidebar"] > div:first-child {
+            padding-top: 1.15rem;
+        }
+
+        [data-testid="stSidebar"] h1,
+        [data-testid="stSidebar"] h2,
+        [data-testid="stSidebar"] h3 {
+            letter-spacing: 0;
         }
 
         [data-testid="stSidebar"] [data-testid="stMarkdownContainer"] p,
@@ -84,6 +110,20 @@ def apply_app_theme() -> None:
         [data-testid="stSidebar"] h2,
         [data-testid="stSidebar"] h3 {
             color: #f8fafc !important;
+        }
+
+        [data-testid="stSidebar"] [data-testid="stAlert"] {
+            background: rgba(255, 255, 255, 0.10);
+            border: 1px solid rgba(178, 242, 255, 0.20);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+        }
+
+        [data-testid="stSidebar"] [data-testid="stAlert"] p {
+            color: #dbeafe !important;
+        }
+
+        [data-testid="stSidebarNav"] {
+            padding-top: 0;
         }
 
         h1, h2, h3 {
@@ -119,6 +159,12 @@ def apply_app_theme() -> None:
             color: var(--text);
         }
 
+        div[data-testid="stCaptionContainer"],
+        div[data-testid="stCaptionContainer"] p {
+            color: #697589;
+            font-size: 0.86rem;
+        }
+
         input[type="radio"],
         input[type="checkbox"],
         input[type="range"] {
@@ -136,26 +182,33 @@ def apply_app_theme() -> None:
         }
 
         [data-testid="stRadio"] [role="radiogroup"] {
-            background: rgba(255, 255, 255, 0.72);
-            border: 1px solid rgba(219, 228, 234, 0.88);
-            border-radius: 8px;
-            box-shadow: var(--shadow-soft);
+            background: rgba(255, 255, 255, 0.80);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(182, 198, 197, 0.82);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-soft), var(--shadow-hairline);
             display: grid !important;
-            gap: 0.45rem;
+            gap: 0.5rem;
             grid-template-columns: repeat(5, minmax(0, 1fr));
-            padding: 0.45rem;
+            padding: 0.5rem;
             width: 100% !important;
         }
 
         [data-testid="stRadio"] label {
             background: transparent;
             border: 1px solid transparent;
-            border-radius: 8px;
-            min-height: 42px;
-            padding: 0.22rem 0.9rem;
-            transition: background-color 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
+            border-radius: var(--radius);
+            min-height: 46px;
+            padding: 0.26rem 0.92rem;
+            transition: background-color 180ms ease, border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
             justify-content: center;
             width: 100%;
+        }
+
+        [data-testid="stRadio"] label:hover {
+            background: rgba(229, 247, 246, 0.68);
+            border-color: rgba(8, 127, 140, 0.18);
+            transform: translateY(-1px);
         }
 
         [data-testid="stRadio"] label [data-testid="stMarkdownContainer"],
@@ -175,9 +228,10 @@ def apply_app_theme() -> None:
         }
 
         [data-testid="stRadio"] label:has(input:checked) {
-            background: linear-gradient(135deg, #e6fbff, #eef2ff);
-            border-color: #73cbd7;
-            box-shadow: 0 12px 28px rgba(11, 114, 133, 0.18), inset 0 0 0 1px rgba(11, 114, 133, 0.22);
+            background:
+                linear-gradient(135deg, rgba(229, 247, 246, 0.98), rgba(238, 242, 255, 0.96));
+            border-color: rgba(8, 127, 140, 0.42);
+            box-shadow: 0 12px 24px rgba(8, 127, 140, 0.16), inset 0 0 0 1px rgba(8, 127, 140, 0.22);
         }
 
         [data-testid="stRadio"] label:has(input:checked) p {
@@ -188,8 +242,8 @@ def apply_app_theme() -> None:
         [data-testid="stSelectbox"] [data-baseweb="select"] > div {
             background: rgba(255, 255, 255, 0.92);
             border-color: var(--border);
-            border-radius: 8px;
-            box-shadow: var(--shadow-soft);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-soft), var(--shadow-hairline);
         }
 
         [data-testid="stSelectbox"] label p,
@@ -214,11 +268,12 @@ def apply_app_theme() -> None:
         }
 
         [data-testid="stMetric"] {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 8px;
+            background:
+                linear-gradient(135deg, rgba(255, 255, 255, 0.99), rgba(249, 252, 251, 0.98));
+            border: 1px solid rgba(214, 224, 223, 0.94);
+            border-radius: var(--radius);
             padding: 1rem 1rem 0.95rem;
-            box-shadow: var(--shadow-soft);
+            box-shadow: var(--shadow-soft), var(--shadow-hairline);
             position: relative;
             overflow: hidden;
             transform-origin: center;
@@ -252,7 +307,7 @@ def apply_app_theme() -> None:
         [data-testid="stMetric"]:hover {
             border-color: rgba(11, 114, 133, 0.34);
             box-shadow: var(--shadow-lift);
-            transform: translateY(-5px) scale(1.035);
+            transform: translateY(-3px) scale(1.012);
         }
 
         [data-testid="stMetricDelta"] {
@@ -267,7 +322,7 @@ def apply_app_theme() -> None:
         }
 
         [data-testid="stTabs"] button[role="tab"] {
-            border-radius: 8px 8px 0 0;
+            border-radius: var(--radius) var(--radius) 0 0;
             padding: 0.75rem 1rem;
         }
 
@@ -284,23 +339,23 @@ def apply_app_theme() -> None:
         [data-testid="stJson"],
         [data-testid="stCodeBlock"],
         [data-testid="stPlotlyChart"] {
-            border-radius: 8px;
+            border-radius: var(--radius);
         }
 
         [data-testid="stDataFrame"],
         [data-testid="stTable"],
         [data-testid="stJson"],
         [data-testid="stCodeBlock"] {
-            background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(246, 251, 255, 0.96));
-            border: 1px solid rgba(188, 205, 216, 0.88);
-            box-shadow: 0 16px 40px rgba(15, 23, 42, 0.10);
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(249, 252, 251, 0.98));
+            border: 1px solid rgba(182, 198, 197, 0.88);
+            box-shadow: var(--shadow-soft), var(--shadow-hairline);
             overflow: hidden;
         }
 
         [data-testid="stDataFrame"] [role="columnheader"],
         [data-testid="stDataFrame"] thead tr th,
         [data-testid="stTable"] thead tr th {
-            background: #eef7f9 !important;
+            background: #e8f5f4 !important;
             color: var(--primary-dark) !important;
             font-weight: 780 !important;
         }
@@ -317,10 +372,10 @@ def apply_app_theme() -> None:
         }
 
         .proof-table-wrap {
-            background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(246, 251, 255, 0.96));
-            border: 1px solid rgba(188, 205, 216, 0.88);
-            border-radius: 8px;
-            box-shadow: 0 16px 40px rgba(15, 23, 42, 0.10);
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(249, 252, 251, 0.98));
+            border: 1px solid rgba(182, 198, 197, 0.88);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-soft), var(--shadow-hairline);
             margin: 0.55rem 0 1rem;
             overflow: hidden;
         }
@@ -332,7 +387,7 @@ def apply_app_theme() -> None:
         }
 
         .proof-table thead th {
-            background: #eef7f9;
+            background: #e8f5f4;
             color: var(--primary-dark);
             font-size: 0.8rem;
             font-weight: 780;
@@ -352,44 +407,37 @@ def apply_app_theme() -> None:
         }
 
         .proof-table tbody tr:nth-child(even) td {
-            background: rgba(237, 247, 248, 0.44);
+            background: rgba(243, 248, 246, 0.66);
         }
 
         .proof-table tbody tr:hover td {
-            background: rgba(231, 246, 248, 0.86);
+            background: rgba(229, 247, 246, 0.82);
         }
 
         [data-testid="stPlotlyChart"] {
             background:
-                linear-gradient(90deg, rgba(11, 114, 133, 0.045) 1px, transparent 1px),
-                linear-gradient(180deg, rgba(11, 114, 133, 0.04) 1px, transparent 1px),
-                linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(241, 248, 251, 0.98));
+                linear-gradient(90deg, rgba(8, 127, 140, 0.045) 1px, transparent 1px),
+                linear-gradient(180deg, rgba(79, 70, 229, 0.040) 1px, transparent 1px),
+                linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(246, 250, 249, 0.99));
             background-size: 34px 34px, 34px 34px, auto;
-            border: 1px solid rgba(154, 181, 195, 0.92);
-            box-shadow: 0 24px 64px rgba(15, 23, 42, 0.14);
+            border: 1px solid rgba(154, 181, 181, 0.88);
+            box-shadow: 0 22px 58px rgba(15, 23, 42, 0.12), var(--shadow-hairline);
             overflow: hidden;
             padding: 0.65rem;
             position: relative;
         }
 
         [data-testid="stPlotlyChart"]::before {
-            background: linear-gradient(90deg, #0b7285, #364fc7 44%, rgba(54, 79, 199, 0.08));
+            background: linear-gradient(90deg, var(--primary), var(--accent) 48%, var(--accent-2));
             content: "";
-            height: 5px;
+            height: 4px;
             inset: 0 0 auto;
             position: absolute;
             z-index: 1;
         }
 
         [data-testid="stPlotlyChart"]::after {
-            background: radial-gradient(circle, rgba(54, 79, 199, 0.09), transparent 58%);
-            content: "";
-            height: 170px;
-            pointer-events: none;
-            position: absolute;
-            right: -72px;
-            top: -82px;
-            width: 240px;
+            content: none;
         }
 
         [data-testid="stPlotlyChart"] .js-plotly-plot .plotly .hoverlayer .hovertext path {
@@ -405,16 +453,26 @@ def apply_app_theme() -> None:
         }
 
         [data-testid="stAlert"] {
-            border-radius: 8px;
+            border-radius: var(--radius);
             border: 1px solid rgba(15, 23, 42, 0.08);
+            box-shadow: var(--shadow-hairline);
         }
 
         [data-testid="stButton"] button,
         [data-testid="baseButton-secondary"],
         [data-testid="baseButton-primary"] {
-            border-radius: 8px !important;
+            border-radius: var(--radius) !important;
             border-color: var(--border) !important;
-            box-shadow: var(--shadow-soft) !important;
+            box-shadow: var(--shadow-soft), var(--shadow-hairline) !important;
+            min-height: 44px;
+            transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+        }
+
+        [data-testid="stButton"] button:hover,
+        [data-testid="baseButton-secondary"]:hover,
+        [data-testid="baseButton-primary"]:hover {
+            border-color: rgba(8, 127, 140, 0.38) !important;
+            transform: translateY(-1px);
         }
 
         [data-testid="baseButton-primary"] {
@@ -424,13 +482,14 @@ def apply_app_theme() -> None:
 
         .hero-panel {
             background:
-                radial-gradient(circle at 76% 20%, rgba(45, 212, 191, 0.36), transparent 250px),
-                radial-gradient(circle at 92% 84%, rgba(79, 70, 229, 0.28), transparent 300px),
-                linear-gradient(135deg, rgba(9, 20, 38, 0.99), rgba(7, 82, 96, 0.98) 52%, rgba(40, 57, 169, 0.92)),
+                linear-gradient(90deg, rgba(255,255,255,0.10) 1px, transparent 1px),
+                linear-gradient(180deg, rgba(255,255,255,0.08) 1px, transparent 1px),
+                linear-gradient(135deg, rgba(9, 20, 38, 0.99), rgba(7, 84, 92, 0.98) 50%, rgba(55, 47, 151, 0.94)),
                 #0f172a;
+            background-size: 36px 36px, 36px 36px, auto, auto;
             border: 1px solid rgba(255, 255, 255, 0.16);
-            border-radius: 8px;
-            box-shadow: 0 34px 90px rgba(15, 23, 42, 0.28);
+            border-radius: var(--radius);
+            box-shadow: 0 34px 90px rgba(15, 23, 42, 0.26), inset 0 1px 0 rgba(255, 255, 255, 0.12);
             margin-bottom: 1.55rem;
             min-height: 350px;
             overflow: hidden;
@@ -440,10 +499,12 @@ def apply_app_theme() -> None:
 
         .hero-panel::before {
             background:
-                radial-gradient(circle at center, transparent 0 28px, rgba(178, 242, 255, 0.28) 29px 31px, transparent 32px 54px, rgba(178, 242, 255, 0.18) 55px 57px, transparent 58px),
-                linear-gradient(135deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.03));
+                linear-gradient(90deg, rgba(178, 242, 255, 0.20) 1px, transparent 1px),
+                linear-gradient(180deg, rgba(178, 242, 255, 0.16) 1px, transparent 1px),
+                linear-gradient(135deg, rgba(255, 255, 255, 0.17), rgba(255, 255, 255, 0.04));
+            background-size: 22px 22px, 22px 22px, auto;
             border: 1px solid rgba(255, 255, 255, 0.16);
-            border-radius: 8px;
+            border-radius: var(--radius);
             content: "";
             height: 230px;
             opacity: 0.62;
@@ -456,12 +517,12 @@ def apply_app_theme() -> None:
 
         .hero-panel::after {
             background:
-                linear-gradient(90deg, rgba(255,255,255,0.13) 1px, transparent 1px),
-                linear-gradient(180deg, rgba(255,255,255,0.11) 1px, transparent 1px);
-            background-size: 38px 38px;
+                linear-gradient(90deg, transparent, rgba(255, 247, 230, 0.18), transparent),
+                linear-gradient(180deg, rgba(255,255,255,0.08), transparent 45%);
+            background-size: auto;
             content: "";
             inset: 0;
-            opacity: 0.30;
+            opacity: 0.70;
             pointer-events: none;
             position: absolute;
         }
@@ -491,7 +552,7 @@ def apply_app_theme() -> None:
 
         .hero-copy {
             max-width: 760px;
-            color: #dbeafe;
+            color: #deebf4;
             font-size: 1.12rem;
             margin: 0.75rem 0 0;
         }
@@ -505,7 +566,8 @@ def apply_app_theme() -> None:
 
         .status-pill {
             align-items: center;
-            background: rgba(255, 255, 255, 0.14);
+            background: rgba(255, 255, 255, 0.13);
+            backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.28);
             border-radius: 999px;
             color: #f8fafc;
@@ -514,7 +576,7 @@ def apply_app_theme() -> None:
             font-weight: 700;
             min-height: 34px;
             padding: 0.35rem 0.72rem;
-            box-shadow: 0 10px 24px rgba(0, 0, 0, 0.16);
+            box-shadow: 0 10px 24px rgba(0, 0, 0, 0.14), inset 0 1px 0 rgba(255, 255, 255, 0.08);
         }
 
         .status-pill.secondary {
@@ -531,10 +593,10 @@ def apply_app_theme() -> None:
 
         .module-heading {
             background:
-                linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(238, 247, 249, 0.96));
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            box-shadow: var(--shadow-soft);
+                linear-gradient(135deg, rgba(255, 255, 255, 0.99), rgba(243, 248, 246, 0.98));
+            border: 1px solid rgba(214, 224, 223, 0.92);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-soft), var(--shadow-hairline);
             margin: 1rem 0 1.15rem;
             padding: 1.2rem 1.35rem;
             position: relative;
@@ -542,7 +604,7 @@ def apply_app_theme() -> None:
         }
 
         .module-heading::after {
-            background: linear-gradient(90deg, var(--primary), transparent);
+            background: linear-gradient(90deg, var(--primary), var(--accent), var(--accent-2), transparent);
             content: "";
             height: 3px;
             inset: 0 0 auto;
@@ -568,28 +630,29 @@ def apply_app_theme() -> None:
 
         .insight-grid {
             display: grid;
-            gap: 0.8rem;
+            gap: 0.9rem;
             grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
             margin: 0.7rem 0 1.15rem;
         }
 
         .insight-card {
             background:
-                linear-gradient(135deg, #ffffff 0%, #f7fbff 100%);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            box-shadow: var(--shadow-soft);
+                linear-gradient(135deg, rgba(255, 255, 255, 0.99) 0%, rgba(249, 252, 251, 0.98) 100%);
+            border: 1px solid rgba(214, 224, 223, 0.94);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-soft), var(--shadow-hairline);
             padding: 1.15rem;
             position: relative;
+            overflow: hidden;
             transform-origin: center;
             transition: transform 220ms cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 220ms ease, border-color 220ms ease, background 220ms ease;
         }
 
         .insight-card::after {
-            background: linear-gradient(90deg, rgba(11, 114, 133, 0.16), rgba(54, 79, 199, 0.08));
+            background: linear-gradient(90deg, rgba(8, 127, 140, 0.26), rgba(37, 99, 235, 0.16), rgba(79, 70, 229, 0.18));
             content: "";
-            height: 3px;
-            inset: auto 1rem 0;
+            height: 4px;
+            inset: auto 0 0;
             position: absolute;
         }
 
@@ -598,7 +661,7 @@ def apply_app_theme() -> None:
         .concept-step:hover {
             border-color: rgba(11, 114, 133, 0.34);
             box-shadow: var(--shadow-lift);
-            transform: translateY(-5px) scale(1.035);
+            transform: translateY(-3px) scale(1.012);
         }
 
         .insight-label {
@@ -633,10 +696,10 @@ def apply_app_theme() -> None:
 
         .metric-explainer {
             background:
-                linear-gradient(135deg, #ffffff 0%, #f6fbff 100%);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            box-shadow: var(--shadow-soft);
+                linear-gradient(135deg, rgba(255, 255, 255, 0.99) 0%, rgba(249, 252, 251, 0.98) 100%);
+            border: 1px solid rgba(214, 224, 223, 0.94);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-soft), var(--shadow-hairline);
             min-height: 160px;
             padding: 1.18rem 1.1rem 1.05rem 1.25rem;
             position: relative;
@@ -646,7 +709,7 @@ def apply_app_theme() -> None:
         }
 
         .metric-explainer::before {
-            background: linear-gradient(180deg, var(--primary), var(--accent));
+            background: linear-gradient(180deg, var(--primary), var(--accent), var(--accent-2));
             content: "";
             inset: 0 auto 0 0;
             position: absolute;
@@ -654,12 +717,16 @@ def apply_app_theme() -> None:
         }
 
         .metric-explainer::after {
-            background: radial-gradient(circle, rgba(11, 114, 133, 0.12), transparent 64%);
+            background:
+                linear-gradient(90deg, rgba(8, 127, 140, 0.10) 1px, transparent 1px),
+                linear-gradient(180deg, rgba(37, 99, 235, 0.09) 1px, transparent 1px);
+            background-size: 15px 15px;
             content: "";
             height: 90px;
+            opacity: 0.46;
             position: absolute;
-            right: -32px;
-            top: -36px;
+            right: -24px;
+            top: -28px;
             width: 120px;
         }
 
@@ -692,10 +759,12 @@ def apply_app_theme() -> None:
         .health-grid {
             display: grid;
             background:
-                radial-gradient(circle at 12% 0%, rgba(45, 212, 191, 0.16), transparent 220px),
+                linear-gradient(90deg, rgba(255,255,255,0.075) 1px, transparent 1px),
+                linear-gradient(180deg, rgba(255,255,255,0.060) 1px, transparent 1px),
                 linear-gradient(135deg, #071827, #073b4c 48%, #172554);
+            background-size: 28px 28px, 28px 28px, auto;
             border: 1px solid rgba(178, 242, 255, 0.22);
-            border-radius: 8px;
+            border-radius: var(--radius);
             box-shadow: 0 28px 76px rgba(15, 23, 42, 0.22);
             gap: 0.8rem;
             grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -706,23 +775,15 @@ def apply_app_theme() -> None:
         }
 
         .health-grid::before {
-            background:
-                linear-gradient(90deg, rgba(255,255,255,0.08) 1px, transparent 1px),
-                linear-gradient(180deg, rgba(255,255,255,0.07) 1px, transparent 1px);
-            background-size: 28px 28px;
-            content: "";
-            inset: 0;
-            opacity: 0.46;
-            pointer-events: none;
-            position: absolute;
+            content: none;
         }
 
         .health-card {
             background: rgba(255, 255, 255, 0.10);
             backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.18);
-            border-radius: 8px;
-            box-shadow: 0 18px 42px rgba(0, 0, 0, 0.14);
+            border-radius: var(--radius);
+            box-shadow: 0 18px 42px rgba(0, 0, 0, 0.14), inset 0 1px 0 rgba(255, 255, 255, 0.08);
             min-height: 145px;
             overflow: hidden;
             padding: 1rem 1rem 0.95rem 1.1rem;
@@ -786,19 +847,22 @@ def apply_app_theme() -> None:
 
         .anomaly-card {
             background:
-                radial-gradient(circle at 100% 0%, rgba(54, 79, 199, 0.12), transparent 150px),
-                linear-gradient(135deg, #ffffff, #f6fbff);
-            border: 1px solid rgba(154, 181, 195, 0.92);
-            border-radius: 8px;
-            box-shadow: 0 20px 54px rgba(15, 23, 42, 0.13);
+                linear-gradient(90deg, rgba(8, 127, 140, 0.052) 1px, transparent 1px),
+                linear-gradient(180deg, rgba(79, 70, 229, 0.045) 1px, transparent 1px),
+                linear-gradient(135deg, #ffffff, #f8fbfa);
+            background-size: 26px 26px, 26px 26px, auto;
+            border: 1px solid rgba(154, 181, 181, 0.88);
+            border-radius: var(--radius);
+            box-shadow: 0 20px 54px rgba(15, 23, 42, 0.12), var(--shadow-hairline);
             min-height: 250px;
             overflow: hidden;
             padding: 1.05rem 1.05rem 1rem;
             position: relative;
+            transition: transform 220ms ease, box-shadow 220ms ease, border-color 220ms ease;
         }
 
         .anomaly-card::before {
-            background: linear-gradient(180deg, #364fc7, #0b7285);
+            background: linear-gradient(180deg, var(--accent), var(--primary), var(--accent-2));
             content: "";
             inset: 0 auto 0 0;
             position: absolute;
@@ -835,9 +899,9 @@ def apply_app_theme() -> None:
         }
 
         .anomaly-list li {
-            background: rgba(231, 246, 248, 0.76);
-            border: 1px solid rgba(123, 199, 209, 0.30);
-            border-radius: 8px;
+            background: rgba(229, 247, 246, 0.76);
+            border: 1px solid rgba(123, 199, 209, 0.34);
+            border-radius: var(--radius);
             color: #334155;
             font-size: 0.86rem;
             line-height: 1.38;
@@ -848,14 +912,15 @@ def apply_app_theme() -> None:
         .story-panel,
         .takeaway-panel {
             background:
-                linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(246, 251, 255, 0.98));
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            box-shadow: var(--shadow-soft);
+                linear-gradient(135deg, rgba(255, 255, 255, 0.99), rgba(249, 252, 251, 0.98));
+            border: 1px solid rgba(214, 224, 223, 0.94);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-soft), var(--shadow-hairline);
             margin: 0.95rem 0 1.15rem;
             padding: clamp(1.1rem, 2.8vw, 1.55rem);
             position: relative;
             overflow: hidden;
+            transition: transform 220ms ease, box-shadow 220ms ease, border-color 220ms ease;
         }
 
         .story-panel {
@@ -864,9 +929,13 @@ def apply_app_theme() -> None:
 
         .story-panel::after,
         .takeaway-panel::after {
-            background: radial-gradient(circle, rgba(54, 79, 199, 0.08), transparent 64%);
+            background:
+                linear-gradient(90deg, rgba(8, 127, 140, 0.085) 1px, transparent 1px),
+                linear-gradient(180deg, rgba(79, 70, 229, 0.070) 1px, transparent 1px);
+            background-size: 16px 16px;
             content: "";
             height: 130px;
+            opacity: 0.50;
             position: absolute;
             right: -54px;
             top: -58px;
@@ -908,18 +977,18 @@ def apply_app_theme() -> None:
         }
 
         .takeaway-panel {
-            background: linear-gradient(180deg, #f7fbff, #ffffff);
+            background: linear-gradient(180deg, #f3f7ff, #ffffff);
             border-color: #c7d7fe;
         }
 
         .takeaway-panel.success {
-            background: linear-gradient(180deg, #ebfbee, #ffffff);
-            border-color: #b2f2bb;
+            background: linear-gradient(180deg, #edf7ff, #ffffff);
+            border-color: #b8d7ff;
         }
 
         .takeaway-panel.warning {
-            background: linear-gradient(180deg, #fff9e8, #ffffff);
-            border-color: #f5d78a;
+            background: linear-gradient(180deg, #e8f2ff, #ffffff);
+            border-color: #bfd3ff;
         }
 
         .concept-flow {
@@ -931,10 +1000,10 @@ def apply_app_theme() -> None:
 
         .concept-step {
             background:
-                linear-gradient(135deg, #ffffff 0%, #f6fbff 100%);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            box-shadow: var(--shadow-soft);
+                linear-gradient(135deg, rgba(255, 255, 255, 0.99) 0%, rgba(249, 252, 251, 0.98) 100%);
+            border: 1px solid rgba(214, 224, 223, 0.94);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-soft), var(--shadow-hairline);
             padding: 1.15rem;
             position: relative;
             overflow: hidden;
@@ -943,7 +1012,10 @@ def apply_app_theme() -> None:
         }
 
         .concept-step::after {
-            background: linear-gradient(180deg, rgba(11, 114, 133, 0.08), transparent);
+            background:
+                linear-gradient(180deg, rgba(8, 127, 140, 0.07), transparent 54%),
+                linear-gradient(90deg, rgba(8, 127, 140, 0.075) 1px, transparent 1px);
+            background-size: auto, 18px 18px;
             content: "";
             inset: 0;
             pointer-events: none;
@@ -963,6 +1035,7 @@ def apply_app_theme() -> None:
             width: 30px;
             position: relative;
             z-index: 1;
+            box-shadow: 0 10px 20px rgba(8, 127, 140, 0.22);
         }
 
         .concept-title {
@@ -986,6 +1059,16 @@ def apply_app_theme() -> None:
             border-radius: 6px;
         }
 
+        [data-testid="stCodeBlock"] pre {
+            background: #0f172a !important;
+            border: 1px solid rgba(255, 255, 255, 0.10);
+        }
+
+        [data-testid="stCodeBlock"] code {
+            color: #dbeafe !important;
+            font-variant-ligatures: none;
+        }
+
         @media (max-width: 760px) {
             .block-container {
                 padding-left: 1rem;
@@ -994,6 +1077,16 @@ def apply_app_theme() -> None:
 
             [data-testid="stRadio"] [role="radiogroup"] {
                 grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            [data-testid="stRadio"] label {
+                min-height: 44px;
+                padding-left: 0.55rem;
+                padding-right: 0.55rem;
+            }
+
+            .hero-panel {
+                min-height: 310px;
             }
 
             .hero-panel,
@@ -1021,21 +1114,6 @@ def apply_app_theme() -> None:
             [data-testid="stMetric"]:hover,
             .concept-step:hover {
                 transform: none;
-            }
-        }
-
-        @media (min-width: 900px) {
-            [data-testid="stSidebar"][aria-expanded="false"] {
-                margin-left: 0 !important;
-                min-width: 25rem !important;
-                transform: translateX(0) !important;
-                visibility: visible !important;
-                width: 25rem !important;
-            }
-
-            [data-testid="stSidebar"][aria-expanded="false"] > div {
-                opacity: 1 !important;
-                visibility: visible !important;
             }
         }
         </style>
@@ -1193,12 +1271,12 @@ def style_chart(fig: go.Figure, *, height: int | None = None) -> go.Figure:
     fig.update_layout(
         colorway=COLORWAY,
         dragmode=False,
-        font={"family": "Inter, Segoe UI, Arial, sans-serif", "color": "#0f172a"},
+        font={"family": "Inter, Segoe UI, Arial, sans-serif", "color": "#182235"},
         paper_bgcolor="rgba(0,0,0,0)",
-        plot_bgcolor="rgba(248,251,253,0.92)",
+        plot_bgcolor="rgba(249,252,251,0.94)",
         margin={"l": 46, "r": 26, "t": 78, "b": 52},
         title={
-            "font": {"size": 17, "color": "#172033", "family": "Inter, Segoe UI, Arial, sans-serif"},
+            "font": {"size": 17, "color": "#182235", "family": "Inter, Segoe UI, Arial, sans-serif"},
             "x": 0.02,
             "xanchor": "left",
             "y": 0.96,
@@ -1211,7 +1289,7 @@ def style_chart(fig: go.Figure, *, height: int | None = None) -> go.Figure:
             "xanchor": "right",
             "x": 1,
             "bgcolor": "rgba(255,255,255,0.74)",
-            "bordercolor": "rgba(188,205,216,0.68)",
+            "bordercolor": "rgba(182,198,197,0.72)",
             "borderwidth": 1,
             "font": {"size": 12, "color": "#334155"},
             "itemsizing": "constant",
@@ -1220,8 +1298,8 @@ def style_chart(fig: go.Figure, *, height: int | None = None) -> go.Figure:
         hoverlabel={
             "align": "left",
             "bgcolor": "#ffffff",
-            "font": {"family": "Inter, Segoe UI, Arial, sans-serif", "size": 13, "color": "#172033"},
-            "bordercolor": "#364fc7",
+            "font": {"family": "Inter, Segoe UI, Arial, sans-serif", "size": 13, "color": "#182235"},
+            "bordercolor": "#4F46E5",
             "namelength": -1,
         },
         separators=".,",
@@ -1229,8 +1307,8 @@ def style_chart(fig: go.Figure, *, height: int | None = None) -> go.Figure:
     fig.update_traces(marker_line_color="rgba(255,255,255,0.88)", marker_line_width=1.1, selector={"type": "bar"})
     fig.update_xaxes(
         showgrid=True,
-        gridcolor="rgba(11, 114, 133, 0.10)",
-        linecolor="rgba(188, 205, 216, 0.78)",
+        gridcolor="rgba(8, 127, 140, 0.10)",
+        linecolor="rgba(182, 198, 197, 0.78)",
         tickfont={"color": "#64748b", "size": 12},
         title_font={"color": "#596579", "size": 13},
         zeroline=False,
@@ -1238,8 +1316,8 @@ def style_chart(fig: go.Figure, *, height: int | None = None) -> go.Figure:
     )
     fig.update_yaxes(
         showgrid=True,
-        gridcolor="rgba(11, 114, 133, 0.10)",
-        linecolor="rgba(188, 205, 216, 0.78)",
+        gridcolor="rgba(8, 127, 140, 0.10)",
+        linecolor="rgba(182, 198, 197, 0.78)",
         tickfont={"color": "#64748b", "size": 12},
         title_font={"color": "#596579", "size": 13},
         zeroline=False,

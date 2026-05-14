@@ -153,8 +153,8 @@ def render_m3() -> None:
         custom_data=["period_index", "period_start_label", "difficulty_label", "average_block_minutes"],
     )
     difficulty_fig.update_traces(
-        line={"width": 3, "color": "#0B7285"},
-        marker={"size": 10, "color": "#364FC7", "line": {"width": 2, "color": "#ffffff"}},
+        line={"width": 3, "color": "#087F8C"},
+        marker={"size": 10, "color": "#4F46E5", "line": {"width": 2, "color": "#ffffff"}},
         hovertemplate=(
             "<b>Adjustment %{customdata[0]:,}</b><br>"
             "Date: %{customdata[1]}<br>"
@@ -193,7 +193,7 @@ def render_m3() -> None:
         ],
     )
     ratio_fig.update_traces(
-        marker_color="#0B7285",
+        marker_color="#087F8C",
         marker_line_color="rgba(255,255,255,0.9)",
         marker_line_width=1.2,
         hovertemplate=(
@@ -210,7 +210,7 @@ def render_m3() -> None:
     ratio_fig.add_hline(
         y=1,
         line_dash="dash",
-        line_color="#0B7285",
+        line_color="#087F8C",
         annotation_text="Target",
     )
     st.markdown("#### Chart 2: whether blocks were fast or slow")
