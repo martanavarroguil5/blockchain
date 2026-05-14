@@ -14,6 +14,7 @@ st.set_page_config(
     page_title="ProofLab Bitcoin",
     page_icon="C",
     layout="wide",
+    initial_sidebar_state="expanded",
 )
 
 apply_app_theme()
@@ -21,125 +22,125 @@ hero()
 
 with st.sidebar:
     st.header("ProofLab Bitcoin")
-    st.markdown("**Autora:** Marta Navarro")
-    st.markdown("**Tema:** prueba de trabajo en Bitcoin")
+    st.markdown("**Author:** Marta Navarro")
+    st.markdown("**Topic:** Proof of Work in Bitcoin")
     st.divider()
-    st.markdown("**Ruta de lectura**")
-    st.markdown("1. Red en directo")
-    st.markdown("2. Bloque por dentro")
-    st.markdown("3. Dificultad")
-    st.markdown("4. Anomalias con IA")
-    st.info("Cada apartado parte de datos reales y explica como interpretar lo que se ve.")
+    st.markdown("**Reading path**")
+    st.markdown("1. Live network")
+    st.markdown("2. Inside a block")
+    st.markdown("3. Difficulty")
+    st.markdown("4. AI anomalies")
+    st.info("Each section uses real data and explains how to read what you are seeing.")
 
 selected_page = st.radio(
-    "Seccion",
+    "Section",
     [
-        "Mapa",
-        "Red en directo",
-        "Bloque por dentro",
-        "Dificultad",
-        "Anomalias con IA",
+        "Map",
+        "Live network",
+        "Inside a block",
+        "Difficulty",
+        "AI anomalies",
     ],
     horizontal=True,
     label_visibility="collapsed",
 )
 
-if selected_page == "Mapa":
-    st.subheader("Mapa de lectura")
+if selected_page == "Map":
+    st.subheader("Reading map")
     story_panel(
-        "Conceptos base",
-        "Antes de mirar datos, hay que saber que piezas forman Bitcoin.",
-        "Bitcoin es un registro publico de transacciones. Las transacciones se agrupan en bloques, "
-        "cada bloque se enlaza con el anterior y asi se forma la cadena de bloques. Para añadir un bloque, "
-        "los mineros prueban muchos hashes. La regla que tienen que cumplir es concreta: el hash del bloque, interpretado como numero, "
-        "debe ser menor que un numero objetivo. La dificultad no es ese objetivo, sino una forma de decir cuanto se ha endurecido: "
-        "si marca 134 T, encontrar un hash valido es unas 134 billones de veces mas dificil que en el nivel base.",
+        "Core concepts",
+        "Before looking at data, it helps to know the basic pieces of Bitcoin.",
+        "Bitcoin is a public ledger of transactions. Transactions are grouped into blocks, "
+        "each block is linked to the previous one, and together they form the blockchain. To add a block, "
+        "miners try many hashes. The rule they must satisfy is very specific: the block hash, interpreted as a number, "
+        "must be lower than a target number. Difficulty is not that target itself; it is a way to express how much the rule has been hardened: "
+        "if it reads 134 T, finding a valid hash is about 134 trillion times harder than at the base level.",
         [
-            "Bloque: paquete de transacciones aceptado como una nueva pagina del historial.",
-            "Cadena: sucesion de bloques enlazados; cada bloque depende criptograficamente del anterior.",
-            "Hash: huella numerica del bloque; si cambia el bloque, cambia el hash.",
-            "Mineros: ordenadores que prueban hashes para proponer el siguiente bloque.",
-            "Dificultad: escala que endurece el objetivo del hash; cuanto mas alta, menos hashes cumplen la regla.",
-            "Altura: posicion de un bloque dentro de la cadena.",
+            "Block: a package of transactions accepted as a new page of the ledger.",
+            "Chain: a sequence of linked blocks; each block cryptographically depends on the previous one.",
+            "Hash: the numeric fingerprint of a block; if the block changes, the hash changes.",
+            "Miners: computers that try hashes to propose the next block.",
+            "Difficulty: a scale that tightens the hash target; the higher it is, the fewer hashes satisfy the rule.",
+            "Height: the position of a block inside the chain.",
         ],
     )
     story_panel(
-        "Idea central",
-        "La app explica como Bitcoin decide que un bloque es valido.",
-        "La idea es seguir el camino completo: primero ver que esta pasando ahora en la red, "
-        "despues mirar un bloque real por dentro, comprobar su hash y entender por que la dificultad cambia con el tiempo. "
-        "Al final se usan datos recientes para detectar intervalos entre bloques que se salen de lo habitual.",
+        "Main idea",
+        "The app explains how Bitcoin decides that a block is valid.",
+        "The idea is to follow the full path: first see what is happening on the network now, "
+        "then look inside a real block, verify its hash, and understand why difficulty changes over time. "
+        "At the end, recent data is used to detect block intervals that fall outside the usual pattern.",
         [
-            "Red en directo: muestra el ultimo bloque, la dificultad, el hash rate y las transacciones.",
-            "Bloque por dentro: enseña los datos tecnicos del bloque y recalcula su hash.",
-            "Dificultad: explica como Bitcoin intenta mantener un ritmo medio de 10 minutos por bloque.",
-            "Anomalias con IA: busca bloques cuyo tiempo de aparicion fue raro comparado con el contexto reciente.",
+            "Live network: shows the latest block, difficulty, hash rate, and transactions.",
+            "Inside a block: shows the technical fields of a block and recalculates its hash.",
+            "Difficulty: explains how Bitcoin tries to maintain an average rhythm of 10 minutes per block.",
+            "AI anomalies: searches for blocks whose arrival time was unusual compared with recent context.",
         ],
     )
     insight_grid(
         [
-            ("Bloque real", "Datos live", "La informacion viene de exploradores publicos de Bitcoin."),
-            ("Prueba local", "SHA-256 x2", "El hash del header se recalcula desde cero."),
-            ("Ritmo esperado", "10 min", "La dificultad intenta mantener ese promedio a largo plazo."),
-            ("IA", "Isolation Forest", "El modelo destaca patrones temporales poco habituales."),
+            ("Real block", "Live data", "The information comes from public Bitcoin explorers."),
+            ("Local proof", "SHA-256 x2", "The header hash is recalculated from scratch."),
+            ("Expected rhythm", "10 min", "Difficulty tries to keep that average over the long term."),
+            ("AI", "Isolation Forest", "The model highlights unusual timing patterns."),
         ]
     )
-    st.markdown("#### Recorrido")
+    st.markdown("#### Walkthrough")
     concept_flow(
         [
             (
-                "Observar",
-                "Se muestra el ultimo bloque, la dificultad, la potencia estimada y si los bloques recientes estan llegando rapido o lento.",
+                "Observe",
+                "Shows the latest block, difficulty, estimated computing power, and whether recent blocks are arriving fast or slow.",
             ),
             (
-                "Verificar",
-                "Se descarga el bloque crudo, se separa el header de 80 bytes y se comprueba que el hash cumple la regla de Proof of Work.",
+                "Verify",
+                "Downloads the raw block, separates the 80-byte header, and checks whether the hash satisfies the Proof of Work rule.",
             ),
             (
-                "Contextualizar",
-                "Se ve que la dificultad no es fija: cambia cada 2016 bloques para compensar la potencia minera.",
+                "Contextualize",
+                "Shows that difficulty is not fixed: it changes every 2016 blocks to compensate for mining power.",
             ),
             (
-                "Investigar",
-                "Los tiempos entre bloques se convierten en variables y un modelo no supervisado señala casos raros.",
+                "Investigate",
+                "The times between blocks are converted into features, and an unsupervised model marks unusual cases.",
             ),
         ]
     )
-    st.markdown("#### Que se aprende en cada parte")
+    st.markdown("#### What each part teaches")
     styled_table(
         pd.DataFrame(
             {
-            "Parte": ["Red en directo", "Bloque por dentro", "Dificultad", "Anomalias con IA"],
-            "Pregunta principal": [
-                "Que esta pasando ahora en la red Bitcoin?",
-                "Como se comprueba que un bloque hizo trabajo real?",
-                "Por que la dificultad sube o baja con el tiempo?",
-                "Que intervalos entre bloques son raros y merecen revision?",
+            "Part": ["Live network", "Inside a block", "Difficulty", "AI anomalies"],
+            "Main question": [
+                "What is happening on the Bitcoin network right now?",
+                "How can we check that a block did real work?",
+                "Why does difficulty go up or down over time?",
+                "Which block intervals are unusual and worth reviewing?",
             ],
-            "Idea clave": [
-                "El coste de minar se observa con dificultad, hash rate e intervalos.",
-                "Un bloque se puede verificar recalculando su hash.",
-                "El protocolo corrige el ritmo sin una autoridad central.",
-                "La IA ayuda a priorizar patrones temporales poco comunes.",
+            "Key idea": [
+                "The cost of mining can be observed through difficulty, hash rate, and intervals.",
+                "A block can be verified by recalculating its hash.",
+                "The protocol corrects the rhythm without a central authority.",
+                "AI helps prioritize uncommon timing patterns.",
             ],
             }
         )
     )
     takeaway(
-        "Lo importante no es memorizar los numeros.",
-        "Lo importante es entender la cadena de razonamiento: datos reales, verificacion local, mecanismo de ajuste y analisis de patrones. "
-        "Esa es la diferencia entre enseñar datos sueltos y explicar Bitcoin.",
+        "The important part is not memorizing the numbers.",
+        "The important part is understanding the reasoning chain: real data, local verification, adjustment mechanism, and pattern analysis. "
+        "That is the difference between showing isolated data and explaining Bitcoin.",
         tone="success",
     )
 
-elif selected_page == "Red en directo":
+elif selected_page == "Live network":
     render_m1()
 
-elif selected_page == "Bloque por dentro":
+elif selected_page == "Inside a block":
     render_m2()
 
-elif selected_page == "Dificultad":
+elif selected_page == "Difficulty":
     render_m3()
 
-elif selected_page == "Anomalias con IA":
+elif selected_page == "AI anomalies":
     render_m4()

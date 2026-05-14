@@ -75,125 +75,125 @@ def load_latest_header() -> tuple[dict[str, object], ParsedBlockHeader]:
 
 def render_m2() -> None:
     module_header(
-        "Bloque por dentro",
-        "Anatomia de un bloque valido",
-        "Descarga el ultimo bloque, separa su header de 80 bytes y verifica localmente su Proof of Work.",
+        "Inside a block",
+        "Anatomy of a valid block",
+        "Downloads the latest block, separates its 80-byte header, and locally verifies its Proof of Work.",
     )
 
     try:
         latest_block, header = load_latest_header()
     except BlockchainApiError as exc:
-        st.error(f"No se pudo cargar el ultimo bloque desde las fuentes publicas: {exc}")
+        st.error(f"Could not load the latest block from public sources: {exc}")
         return
     except Exception as exc:
-        st.error(f"Error inesperado al verificar el header: {exc}")
+        st.error(f"Unexpected error while verifying the header: {exc}")
         return
 
     hash_matches_api = header.local_hash == latest_block["id"]
     valid_pow = header.is_valid_pow and hash_matches_api
 
     story_panel(
-        "Por que mirar el header",
-        "El header es la parte pequeña del bloque que concentra la prueba criptografica.",
-        "Un bloque completo puede contener muchas transacciones, pero los mineros no prueban el bloque entero una y otra vez: "
-        "trabajan sobre un header de 80 bytes. Si el doble SHA-256 de ese header queda por debajo del objetivo, el bloque demuestra trabajo.",
+        "Why look at the header",
+        "The header is the small part of the block that concentrates the cryptographic proof.",
+        "A full block can contain many transactions, but miners do not test the whole block over and over: "
+        "they work on an 80-byte header. If the double SHA-256 of that header is below the target, the block proves work.",
         [
-            "El hash anterior conecta este bloque con la cadena.",
-            "La raiz de Merkle es un resumen criptografico de todas las transacciones del bloque.",
-            "La verificacion PoW comprueba que el hash del header cumple el objetivo de dificultad.",
-            "El nonce es una de las piezas que el minero puede cambiar para buscar un hash valido.",
+            "The previous hash connects this block to the chain.",
+            "The Merkle root is a cryptographic summary of all transactions in the block.",
+            "PoW verification checks that the header hash satisfies the difficulty target.",
+            "The nonce is one of the fields the miner can change to search for a valid hash.",
         ],
     )
     concept_flow(
         [
-            ("Descargar", "Se obtiene el bloque crudo desde una fuente publica de Bitcoin."),
-            ("Separar", "Se toman los primeros 80 bytes, que forman el header."),
-            ("Hashear", "Se calcula SHA256(SHA256(header)) localmente."),
-            ("Comparar", "El resultado debe coincidir con el bloque publicado y ser menor que el objetivo."),
+            ("Download", "The raw block is obtained from a public Bitcoin source."),
+            ("Separate", "The first 80 bytes are taken; they form the header."),
+            ("Hash", "SHA256(SHA256(header)) is calculated locally."),
+            ("Compare", "The result must match the published block and be lower than the target."),
         ]
     )
 
     metric_explainer_grid(
         [
             (
-                "Altura",
+                "Height",
                 f"{int(latest_block['height']):,}",
-                "Numero del bloque contado desde el primer bloque de Bitcoin.",
+                "Block number counted from the first Bitcoin block.",
             ),
             (
-                "Tamano header",
+                "Header size",
                 "80 bytes",
-                "Parte pequena que se hashea para demostrar trabajo.",
+                "Small part that is hashed to prove work.",
             ),
             (
-                "Ceros iniciales",
+                "Leading zeros",
                 str(leading_zero_bits(header.hash_value)),
-                "Bits a cero al inicio del hash: senal de que el hash es muy pequeno.",
+                "Zero bits at the start of the hash: a sign that the hash is very small.",
             ),
             (
-                "Verificacion PoW",
-                "Valida" if valid_pow else "Revisar",
-                "El hash calculado aqui coincide con el publicado y queda por debajo del objetivo.",
+                "PoW verification",
+                "Valid" if valid_pow else "Review",
+                "The hash calculated here matches the published one and is below the target.",
             ),
         ]
     )
     st.write(
-        "La metrica clave es la verificacion PoW. Si aparece como valida, significa que esta app ha recalculado el hash del bloque "
-        "y ha comprobado que cumple la regla: el valor numerico del hash queda por debajo del objetivo de dificultad."
+        "The key metric is PoW verification. If it appears as valid, it means this app has recalculated the block hash "
+        "and checked that it satisfies the rule: the numeric hash value is below the difficulty target."
     )
 
-    st.markdown("#### Los seis campos del header")
+    st.markdown("#### The six header fields")
     st.write(
-        "Estos son los datos exactos que entran en el hash. La tabla no esta para decorar: permite auditar que informacion se esta verificando."
+        "These are the exact data fields that enter the hash. The table is not decorative: it lets you audit what information is being verified."
     )
     field_rows = [
-        ("Version", str(header.version), "Formato/reglas usadas por el bloque"),
-        ("Hash anterior", header.previous_hash, "Enlace criptografico con el bloque previo"),
+        ("Version", str(header.version), "Format/rules used by the block"),
+        ("Previous hash", header.previous_hash, "Cryptographic link to the previous block"),
         (
-            "Raiz de Merkle",
+            "Merkle root",
             header.merkle_root,
-            "Hash resumen de las transacciones: permite detectar si alguna transaccion del bloque cambiara.",
+            "Summary hash of the transactions: it helps detect whether any transaction in the block changed.",
         ),
-        ("Timestamp", f"{header.timestamp} ({header.timestamp_utc})", "Hora declarada por el minero"),
-        ("Bits", f"{header.bits} / 0x{header.bits:08x}", "Objetivo de dificultad en formato compacto"),
-        ("Nonce", str(header.nonce), "Valor que ayuda a buscar un hash valido"),
+        ("Timestamp", f"{header.timestamp} ({header.timestamp_utc})", "Time declared by the miner"),
+        ("Bits", f"{header.bits} / 0x{header.bits:08x}", "Difficulty target in compact format"),
+        ("Nonce", str(header.nonce), "Value that helps search for a valid hash"),
     ]
     styled_table(
-        pd.DataFrame(field_rows, columns=["Campo", "Valor", "Que significa"]),
+        pd.DataFrame(field_rows, columns=["Field", "Value", "Meaning"]),
     )
 
-    st.markdown("#### Verificacion local con doble SHA-256")
+    st.markdown("#### Local verification with double SHA-256")
     st.write(
-        "Esta parte comprueba el bloque paso a paso. Primero la app calcula de nuevo el hash del header. "
-        "Luego mira si ese hash coincide con el hash oficial del bloque. Por ultimo, comprueba la regla de dificultad: "
-        "el hash debe ser menor que el objetivo. Si ambas comparaciones salen bien, el Proof of Work es valido."
+        "This part checks the block step by step. First, the app calculates the header hash again. "
+        "Then it checks whether that hash matches the official block hash. Finally, it checks the difficulty rule: "
+        "the hash must be lower than the target. If both comparisons pass, the Proof of Work is valid."
     )
     st.code("hash = SHA256(SHA256(80-byte header))", language="text")
-    st.markdown("#### Lectura de la comprobacion")
+    st.markdown("#### How to read the check")
     st.write(
-        "Las dos cajas de la izquierda deben ser iguales. Eso demuestra que el hash se ha reproducido correctamente. "
-        "La caja de la derecha muestra el limite maximo permitido por la dificultad; el resultado `True` significa que el hash queda por debajo de ese limite."
+        "The two boxes on the left must be identical. That shows the hash has been reproduced correctly. "
+        "The box on the right shows the maximum limit allowed by difficulty; the result `Yes` means the hash is below that limit."
     )
     verify_col_1, verify_col_2 = st.columns(2)
     with verify_col_1:
-        st.write("Hash oficial del bloque")
+        st.write("Official block hash")
         st.code(str(latest_block["id"]), language="text")
-        st.write("Hash recalculado por esta app")
+        st.write("Hash recalculated by this app")
         st.code(header.local_hash, language="text")
     with verify_col_2:
-        st.write("Objetivo maximo permitido")
+        st.write("Maximum allowed target")
         st.code(header.target_hex, language="text")
-        st.write("El hash queda por debajo de ese objetivo")
-        st.success("Si" if header.hash_value <= header.target else "No")
+        st.write("The hash is below that target")
+        st.success("Yes" if header.hash_value <= header.target else "No")
 
     if valid_pow:
         takeaway(
-            "El bloque pasa la verificacion.",
-            "El hash calculado localmente coincide con el hash publicado y ademas esta por debajo del objetivo. Eso es exactamente lo que significa que el bloque tiene Proof of Work valido.",
+            "The block passes verification.",
+            "The locally calculated hash matches the published hash and is also below the target. That is exactly what it means for the block to have valid Proof of Work.",
             tone="success",
         )
     else:
-        st.error("La verificacion local ha fallado. Habria que revisar el orden de bytes, el bloque crudo o la respuesta de la fuente publica.")
+        st.error("Local verification failed. The byte order, raw block, or public source response should be reviewed.")
 
-    with st.expander("Header crudo de 80 bytes"):
+    with st.expander("Raw 80-byte header"):
         st.code(header.raw_hex, language="text")

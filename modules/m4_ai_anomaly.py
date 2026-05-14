@@ -1,4 +1,4 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 import numpy as np
 import pandas as pd
@@ -87,8 +87,8 @@ def run_isolation_forest(blocks_df: pd.DataFrame, contamination: float) -> pd.Da
     model_df["model_anomaly"] = predictions == -1
     model_df["anomaly_label"] = np.where(
         model_df["model_anomaly"],
-        "Anomalia Isolation Forest",
-        np.where(model_df["baseline_anomaly"], "Solo z-score", "Normal"),
+        "Isolation Forest anomaly",
+        np.where(model_df["baseline_anomaly"], "z-score only", "Normal"),
     )
     return model_df
 
@@ -105,92 +105,92 @@ def _explain_anomaly(row: pd.Series) -> tuple[str, str, list[str]]:
     score = float(row["isolation_score"])
 
     if interval >= TARGET_BLOCK_MINUTES * 2:
-        title = "Espera larga entre bloques"
+        title = "Long wait between blocks"
         core = (
-            f"Este bloque llego tras {interval:.2f} minutos, mas del doble del objetivo de 10 minutos. "
-            "No implica que el bloque sea invalido, pero si marca una espera poco comoda para la red."
+            f"This block arrived after {interval:.2f} minutes, more than twice the 10-minute target. "
+            "It does not imply the block is invalid, but it does mark an uncomfortable wait for the network."
         )
     elif interval <= TARGET_BLOCK_MINUTES * 0.35:
-        title = "Bloque muy rapido"
+        title = "Very fast block"
         core = (
-            f"Este bloque aparecio en {interval:.2f} minutos. Puede pasar por azar, pero el modelo lo revisa porque se aleja bastante del ritmo esperado."
+            f"This block appeared in {interval:.2f} minutes. This can happen by chance, but the model reviews it because it is far from the expected rhythm."
         )
     else:
-        title = "Rareza contextual"
+        title = "Contextual rarity"
         core = (
-            f"El intervalo fue de {interval:.2f} minutos. No parece extremo por si solo, pero combinado con el contexto reciente el modelo lo considera raro."
+            f"The interval was {interval:.2f} minutes. It does not look extreme by itself, but combined with recent context the model considers it unusual."
         )
 
     reasons = [
-        f"Desvio frente al objetivo: {deviation:.2f} minutos.",
-        f"z-score global: {z_score:.2f}; z-score local: {rolling_z:.2f}.",
-        f"Score Isolation Forest: {score:.4f}; cuanto menor, mas raro para el modelo.",
+        f"Deviation from target: {deviation:.2f} minutes.",
+        f"global z-score: {z_score:.2f}; local z-score: {rolling_z:.2f}.",
+        f"Isolation Forest score: {score:.4f}; the lower it is, the rarer it is for the model.",
     ]
     if bool(row.get("negative_timestamp_jump", False)):
-        reasons.append("El timestamp retrocede respecto al bloque anterior, por eso merece revision adicional.")
+        reasons.append("The timestamp moves backward compared with the previous block, so it deserves additional review.")
     return title, core, reasons
 
 
 def render_m4() -> None:
     module_header(
-        "Anomalias con IA",
-        "IA para detectar tiempos raros",
-        "Un pipeline interpretable que convierte intervalos entre bloques en señales de investigacion.",
+        "AI anomalies",
+        "AI to detect unusual times",
+        "An interpretable pipeline that turns block intervals into investigation signals.",
     )
 
     story_panel(
-        "Que significa anomalia aqui",
-        "Una anomalia no significa fraude ni bloque invalido.",
-        "Significa que el intervalo temporal entre bloques se comporta de forma poco habitual respecto al contexto reciente y al objetivo de 10 minutos. "
-        "El modelo sirve para priorizar revision: señala donde mirar primero, no dicta una sentencia.",
+        "What anomaly means here",
+        "An anomaly does not mean fraud or an invalid block.",
+        "It means the time interval between blocks behaves unusually compared with recent context and the 10-minute target. "
+        "The model is used to prioritize review: it points to where to look first, but it does not deliver a verdict.",
         [
-            "El z-score marca valores extremos de forma simple y explicable.",
-            "Isolation Forest combina varias señales para detectar rareza contextual.",
-            "La evaluacion se centra en tasa de anomalias, solape con baseline y tabla de candidatos.",
+            "The z-score marks extreme values in a simple, explainable way.",
+            "Isolation Forest combines several signals to detect contextual rarity.",
+            "Evaluation focuses on anomaly rate, overlap with the baseline, and the candidate table.",
         ],
     )
     concept_flow(
         [
-            ("Datos", "Se toman bloques recientes y se calcula el tiempo desde el bloque anterior."),
-            ("Features", "Se crean variables de desviacion, medias moviles, volatilidad local y posicion dentro del periodo de dificultad."),
-            ("Baseline", "El z-score separa intervalos muy alejados de la media global."),
-            ("Modelo", "Isolation Forest aprende que puntos son raros al compararlos con el resto de la muestra."),
+            ("Data", "Recent blocks are taken and the time since the previous block is calculated."),
+            ("Features", "Deviation variables, moving averages, local volatility, and position inside the difficulty period are created."),
+            ("Baseline", "The z-score separates intervals that are far from the global mean."),
+            ("Model", "Isolation Forest learns which points are rare by comparing them with the rest of the sample."),
         ]
     )
 
     block_limit = st.slider(
-        "Muestra historica de bloques",
+        "Historical block sample",
         min_value=80,
         max_value=400,
         value=DEFAULT_BLOCK_LIMIT,
         step=40,
-        help="Valores mas altos dan mas contexto al modelo, pero requieren mas llamadas a fuentes publicas.",
+        help="Higher values give the model more context, but require more calls to public sources.",
     )
     contamination = st.slider(
-        "Tasa esperada de anomalias",
+        "Expected anomaly rate",
         min_value=0.01,
         max_value=0.10,
         value=0.04,
         step=0.01,
         format="%.2f",
-        help="Isolation Forest usa este valor como porcentaje aproximado de intervalos a marcar.",
+        help="Isolation Forest uses this value as the approximate percentage of intervals to flag.",
     )
 
     try:
         blocks_df = load_anomaly_features(block_limit)
     except BlockchainApiError as exc:
-        st.error(f"No se pudieron cargar datos publicos para el analisis de IA: {exc}")
+        st.error(f"Could not load public data for the AI analysis: {exc}")
         return
     except Exception as exc:
-        st.error(f"Error inesperado preparando las variables de IA: {exc}")
+        st.error(f"Unexpected error while preparing AI variables: {exc}")
         return
 
     if blocks_df.empty:
-        st.info("Todavia no hay suficientes bloques para calcular variables de anomalia.")
+        st.info("There are not enough blocks yet to calculate anomaly variables.")
         return
 
     if len(blocks_df) < MIN_MODEL_INTERVALS:
-        st.info(f"Hacen falta al menos {MIN_MODEL_INTERVALS} intervalos para entrenar el modelo Isolation Forest.")
+        st.info(f"At least {MIN_MODEL_INTERVALS} intervals are needed to train the Isolation Forest model.")
         return
 
     try:
@@ -199,7 +199,7 @@ def render_m4() -> None:
         st.error(str(exc))
         return
     except Exception as exc:
-        st.error(f"Error inesperado entrenando Isolation Forest: {exc}")
+        st.error(f"Unexpected error while training Isolation Forest: {exc}")
         return
 
     baseline_count = int(results_df["baseline_anomaly"].sum())
@@ -208,13 +208,13 @@ def render_m4() -> None:
     anomaly_rate = model_count / len(results_df)
 
     metric_col_1, metric_col_2, metric_col_3, metric_col_4 = st.columns(4)
-    metric_col_1.metric("Muestra del modelo", f"{len(results_df):,}")
-    metric_col_2.metric("Intervalo medio", f"{results_df['minutes_since_prev'].mean():.2f} min")
-    metric_col_3.metric("Anomalias IA", model_count, delta=_format_percent(anomaly_rate))
-    metric_col_4.metric("Solape baseline", f"{overlap_count}/{max(baseline_count, 1)}")
+    metric_col_1.metric("Model sample", f"{len(results_df):,}")
+    metric_col_2.metric("Average interval", f"{results_df['minutes_since_prev'].mean():.2f} min")
+    metric_col_3.metric("AI anomalies", model_count, delta=_format_percent(anomaly_rate))
+    metric_col_4.metric("Baseline overlap", f"{overlap_count}/{max(baseline_count, 1)}")
     st.write(
-        "El z-score detecta intervalos globalmente extremos. Isolation Forest añade contexto: mira varias variables a la vez y puede marcar un bloque "
-        "porque su patron local es raro, aunque un unico numero no parezca escandaloso."
+        "The z-score detects globally extreme intervals. Isolation Forest adds context: it looks at several variables at once and can flag a block "
+        "because its local pattern is unusual, even if one single number does not look dramatic."
     )
 
     plot_df = results_df.copy()
@@ -222,8 +222,8 @@ def render_m4() -> None:
     plot_df["timestamp_label"] = plot_df["timestamp_dt"].dt.strftime("%Y-%m-%d %H:%M UTC")
     plot_df["tooltip_label"] = plot_df["anomaly_label"].replace(
         {
-            "Anomalia Isolation Forest": "Candidato IA",
-            "Solo z-score": "Extremo estadistico",
+            "Isolation Forest anomaly": "AI candidate",
+            "z-score only": "Statistical extreme",
         }
     )
     plot_df["tooltip_hint"] = np.select(
@@ -232,10 +232,10 @@ def render_m4() -> None:
             plot_df["baseline_anomaly"],
         ],
         [
-            "Prioridad alta para revisar",
-            "Intervalo extremo por z-score",
+            "High priority for review",
+            "Extreme interval by z-score",
         ],
-        default="Comportamiento esperado",
+        default="Expected behavior",
     )
 
     fig = px.scatter(
@@ -246,15 +246,15 @@ def render_m4() -> None:
         size="absolute_target_deviation",
         color_discrete_map={
             "Normal": "#0B7285",
-            "Solo z-score": "#E8590C",
-            "Anomalia Isolation Forest": "#364FC7",
+            "z-score only": "#E8590C",
+            "Isolation Forest anomaly": "#364FC7",
         },
-        title="Intervalos entre bloques y anomalias detectadas",
+        title="Block intervals and detected anomalies",
         labels={
-            "timestamp_dt": "Timestamp del bloque (UTC)",
-            "minutes_since_prev": "Minutos desde el bloque anterior",
-            "anomaly_label": "Clasificacion",
-            "absolute_target_deviation": "Desviacion frente a 10 min",
+            "timestamp_dt": "Block timestamp (UTC)",
+            "minutes_since_prev": "Minutes since previous block",
+            "anomaly_label": "Classification",
+            "absolute_target_deviation": "Deviation from 10 min",
         },
         custom_data=[
             "tooltip_label",
@@ -276,13 +276,13 @@ def render_m4() -> None:
         hovertemplate=(
             "<b>%{customdata[0]}</b><br>"
             "%{customdata[8]}<br><br>"
-            "Bloque %{customdata[2]:,}<br>"
+            "Block %{customdata[2]:,}<br>"
             "%{customdata[1]}<br>"
-            "Intervalo: <b>%{y:.2f} min</b><br>"
-            "Desvio del objetivo: %{customdata[3]:.2f} min<br>"
-            "z global / local: %{customdata[4]:.2f} / %{customdata[5]:.2f}<br>"
-            "Score IA: %{customdata[6]:.4f}<br>"
-            "Hash corto: %{customdata[7]}"
+            "Interval: <b>%{y:.2f} min</b><br>"
+            "Deviation from target: %{customdata[3]:.2f} min<br>"
+            "global/local z-score: %{customdata[4]:.2f} / %{customdata[5]:.2f}<br>"
+            "AI score: %{customdata[6]:.4f}<br>"
+            "Short hash: %{customdata[7]}"
             "<extra></extra>"
         ),
     )
@@ -290,76 +290,76 @@ def render_m4() -> None:
         y=TARGET_BLOCK_MINUTES,
         line_dash="dash",
         line_color="#0B7285",
-        annotation_text="Objetivo 10 min",
+        annotation_text="10 min target",
     )
     st.plotly_chart(style_chart(fig, height=430), width="stretch", config={"displayModeBar": False})
     st.write(
-        "Cada punto es el hueco temporal entre dos bloques consecutivos. Los puntos mas grandes se alejan mas del objetivo de 10 minutos. "
-        "Los puntos marcados como anomalia son los candidatos que conviene revisar primero."
+        "Each point is the time gap between two consecutive blocks. Larger points are farther from the 10-minute target. "
+        "Points marked as anomalies are the candidates worth reviewing first."
     )
 
     comparison_col, feature_col = st.columns([1, 1])
     with comparison_col:
-        st.markdown("#### Evaluacion interpretable")
+        st.markdown("#### Interpretable evaluation")
         st.write(
-            "No existe una etiqueta oficial de 'anomalia real' para estos intervalos, asi que la evaluacion comprueba si el modelo se comporta con sentido: "
-            "cuantos casos marca, cuanto coincide con el baseline y si detecta situaciones temporales llamativas."
+            "There is no official label for a 'real anomaly' in these intervals, so evaluation checks whether the model behaves sensibly: "
+            "how many cases it marks, how much it overlaps with the baseline, and whether it detects striking timing situations."
         )
         styled_table(
             pd.DataFrame(
                 [
-                    ("Anomalias por z-score", baseline_count),
-                    ("Anomalias por Isolation Forest", model_count),
-                    ("Casos compartidos por ambos metodos", overlap_count),
-                    ("Tasa de anomalias del modelo", _format_percent(anomaly_rate)),
-                    ("Saltos temporales negativos marcados", int(results_df.loc[results_df["model_anomaly"], "negative_timestamp_jump"].sum())),
+                    ("z-score anomalies", baseline_count),
+                    ("Isolation Forest anomalies", model_count),
+                    ("Cases shared by both methods", overlap_count),
+                    ("Model anomaly rate", _format_percent(anomaly_rate)),
+                    ("Flagged negative timestamp jumps", int(results_df.loc[results_df["model_anomaly"], "negative_timestamp_jump"].sum())),
                 ],
-                columns=["Metrica", "Valor"],
+                columns=["Metric", "Value"],
             )
         )
 
     with feature_col:
-        st.markdown("#### Variables que usa el modelo")
+        st.markdown("#### Variables used by the model")
         styled_table(
             pd.DataFrame(
                 [
-                    ("minutes_since_prev", "Intervalo observado entre bloques consecutivos"),
-                    ("absolute_target_deviation", "Distancia frente al objetivo de 10 minutos"),
-                    ("rolling_mean_12", "Contexto local de tiempos recientes"),
-                    ("rolling_std_12", "Volatilidad local de los intervalos"),
-                    ("rolling_z_score", "Sorpresa estandarizada en el contexto cercano"),
-                    ("period_position", "Posicion dentro del periodo de ajuste de 2016 bloques"),
-                    ("negative_timestamp_jump", "El timestamp del header retrocede"),
+                    ("minutes_since_prev", "Observed interval between consecutive blocks"),
+                    ("absolute_target_deviation", "Distance from the 10-minute target"),
+                    ("rolling_mean_12", "Local context of recent timings"),
+                    ("rolling_std_12", "Local volatility of intervals"),
+                    ("rolling_z_score", "Standardized surprise in the nearby context"),
+                    ("period_position", "Position within the 2016-block adjustment period"),
+                    ("negative_timestamp_jump", "The header timestamp moves backward"),
                 ],
-                columns=["Variable", "Significado"],
+                columns=["Variable", "Meaning"],
             )
         )
 
-    st.markdown("#### Candidatos prioritarios")
+    st.markdown("#### Priority candidates")
     st.write(
-        "La tabla se ordena por `isolation_score`. Cuanto menor es el score, mas raro le parece el caso al modelo; por eso las primeras filas son las mas interesantes."
+        "The table is sorted by `isolation_score`. The lower the score, the rarer the case looks to the model, so the first rows are the most interesting."
     )
     story_panel(
-        "Antes de leer la tabla",
-        "Que significan los indicadores de rareza",
-        "El `z-score` mide cuanto se separa un intervalo de lo normal: valores grandes en positivo o negativo indican esperas poco habituales. "
-        "El `z-score local` hace una comparacion parecida, pero usando el contexto cercano de bloques recientes. "
-        "El `Score IA` viene de Isolation Forest: no es una probabilidad, sino una puntuacion de rareza; cuanto mas bajo, mas sospechoso le parece al modelo.",
+        "Before reading the table",
+        "What the rarity indicators mean",
+        "The `z-score` measures how far an interval is from normal: large positive or negative values indicate unusual waiting times. "
+        "The `local z-score` makes a similar comparison, but using the nearby context of recent blocks. "
+        "The `AI score` comes from Isolation Forest: it is not a probability, but a rarity score; the lower it is, the more suspicious it looks to the model.",
         [
-            "Un candidato no significa ataque ni bloque invalido.",
-            "Significa que ese intervalo merece explicarse o revisarse antes que otros.",
-            "La lectura humana traduce esos numeros a una frase defendible para la presentacion.",
+            "A candidate does not mean an attack or invalid block.",
+            "It means that interval deserves to be explained or reviewed before others.",
+            "The human reading turns those numbers into a defensible sentence for the presentation.",
         ],
     )
     anomaly_table = results_df.loc[results_df["model_anomaly"]].copy()
     if anomaly_table.empty:
-        st.success("La muestra actual no ha producido candidatos de anomalia.")
+        st.success("The current sample produced no anomaly candidates.")
     else:
         anomaly_table = anomaly_table.sort_values("isolation_score")
         explanation_candidates = anomaly_table.head(3).copy()
         anomaly_table = anomaly_table.head(12)
         anomaly_table["timestamp_dt"] = anomaly_table["timestamp_dt"].dt.strftime("%Y-%m-%d %H:%M UTC")
-        anomaly_table["hash_corto"] = anomaly_table["id"].astype(str).str.slice(0, 6) + "..." + anomaly_table["id"].astype(str).str.slice(-6)
+        anomaly_table["short_hash"] = anomaly_table["id"].astype(str).str.slice(0, 6) + "..." + anomaly_table["id"].astype(str).str.slice(-6)
         anomaly_table["minutes_since_prev"] = anomaly_table["minutes_since_prev"].map(lambda value: f"{float(value):.2f} min")
         anomaly_table["z_score"] = anomaly_table["z_score"].map(lambda value: f"{float(value):.2f}")
         anomaly_table["rolling_z_score"] = anomaly_table["rolling_z_score"].map(lambda value: f"{float(value):.2f}")
@@ -367,36 +367,36 @@ def render_m4() -> None:
         styled_table(
             anomaly_table.rename(
                 columns={
-                    "height": "Bloque",
-                    "timestamp_dt": "Fecha",
-                    "minutes_since_prev": "Intervalo",
+                    "height": "Block",
+                    "timestamp_dt": "Date",
+                    "minutes_since_prev": "Interval",
                     "z_score": "z-score",
-                    "rolling_z_score": "z-score local",
-                    "isolation_score": "Score IA",
-                    "hash_corto": "Hash corto",
+                    "rolling_z_score": "local z-score",
+                    "isolation_score": "AI score",
+                    "short_hash": "Short hash",
                 }
             )[
                 [
-                    "Bloque",
-                    "Fecha",
-                    "Intervalo",
+                    "Block",
+                    "Date",
+                    "Interval",
                     "z-score",
-                    "z-score local",
-                    "Score IA",
-                    "Hash corto",
+                    "local z-score",
+                    "AI score",
+                    "Short hash",
                 ]
             ]
         )
-        st.markdown("#### Lectura humana de los candidatos")
+        st.markdown("#### Human reading of candidates")
         st.write(
-            "Estas fichas traducen la salida del modelo a una explicacion defendible: que paso, por que llama la atencion y que dato conviene mirar."
+            "These cards translate the model output into a defensible explanation: what happened, why it stands out, and which data point is worth checking."
         )
         anomaly_cards: list[tuple[str, str, str, list[str]]] = []
         for _, candidate in explanation_candidates.iterrows():
             title, body, reasons = _explain_anomaly(candidate)
             anomaly_cards.append(
                 (
-                    f"Bloque {int(candidate['height']):,}",
+                    f"Block {int(candidate['height']):,}",
                     title,
                     body,
                     reasons,
@@ -404,29 +404,29 @@ def render_m4() -> None:
             )
         anomaly_card_grid(anomaly_cards)
 
-    st.markdown("#### Resultado del modelo")
+    st.markdown("#### Model result")
     styled_table(
         pd.DataFrame(
             [
-                ("Datos", "Timestamps recientes de bloques Bitcoin con Blockstream y fallback a Mempool.space"),
-                ("Baseline", "Umbral z-score global de 2.5 desviaciones tipicas"),
-                ("Modelo", "Isolation Forest con variables temporales escaladas de forma robusta"),
-                ("Evaluacion", "Tasa de anomalias, solape con colas estadisticas y ranking de candidatos"),
-                ("Limitacion", "Sin etiquetas reales, el resultado es descubrimiento de anomalias, no accuracy supervisada"),
+                ("Data", "Recent Bitcoin block timestamps from Blockstream with fallback to Mempool.space"),
+                ("Baseline", "Global z-score threshold of 2.5 standard deviations"),
+                ("Model", "Isolation Forest with robustly scaled timing variables"),
+                ("Evaluation", "Anomaly rate, overlap with statistical tails, and candidate ranking"),
+                ("Limitation", "Without real labels, the result is anomaly discovery, not supervised accuracy"),
             ],
-            columns=["Area", "Implementacion"],
+            columns=["Area", "Implementation"],
         )
     )
 
     if overlap_count > 0:
         takeaway(
-            "El modelo esta funcionando y coincide parcialmente con el baseline.",
-            "Ese solape ayuda a explicar el resultado: algunos candidatos son extremos tambien con una regla estadistica simple.",
+            "The model is working and partially overlaps with the baseline.",
+            "That overlap helps explain the result: some candidates are also extreme under a simple statistical rule.",
             tone="success",
         )
     else:
         takeaway(
-            "El modelo esta funcionando, pero detecta rareza contextual.",
-            "En esta muestra Isolation Forest no coincide con el z-score global. Eso puede pasar cuando lo raro no es un valor aislado, sino la combinacion de contexto y timing.",
+            "The model is working, but it is detecting contextual rarity.",
+            "In this sample, Isolation Forest does not overlap with the global z-score. That can happen when rarity is not one isolated value, but the combination of context and timing.",
             tone="warning",
         )

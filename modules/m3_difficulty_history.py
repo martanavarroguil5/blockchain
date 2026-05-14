@@ -60,38 +60,38 @@ def load_difficulty_periods(periods: int = 8) -> pd.DataFrame:
 
 def render_m3() -> None:
     module_header(
-        "Dificultad",
-        "La dificultad como piloto automatico",
-        "Periodos recientes de ajuste y comparacion entre tiempo real y objetivo de 10 minutos.",
+        "Difficulty",
+        "Difficulty as an autopilot",
+        "Recent adjustment periods and comparison between real time and the 10-minute target.",
     )
     story_panel(
-        "El problema que resuelve",
-        "Bitcoin necesita que los bloques no salgan ni demasiado rapido ni demasiado lento.",
-        "Como la potencia minera cambia constantemente, la red no puede fijar una dificultad para siempre. "
-        "Cada 2016 bloques compara el tiempo real con el tiempo esperado y ajusta la dificultad para volver al ritmo de 10 minutos por bloque.",
+        "The problem it solves",
+        "Bitcoin needs blocks to appear neither too fast nor too slow.",
+        "Because mining power changes constantly, the network cannot set one difficulty forever. "
+        "Every 2016 blocks, it compares real elapsed time with expected time and adjusts difficulty to return to the 10-minute-per-block rhythm.",
         [
-            "Si los bloques llegan demasiado rapido, la dificultad tiende a subir.",
-            "Si llegan demasiado lento, la dificultad tiende a bajar.",
-            "El ajuste no reacciona a un bloque aislado, sino a un periodo completo.",
+            "If blocks arrive too fast, difficulty tends to rise.",
+            "If blocks arrive too slowly, difficulty tends to fall.",
+            "The adjustment does not react to one isolated block, but to a full period.",
         ],
     )
     concept_flow(
         [
             (
-                "Elegir muestra",
-                "Se decide cuantos periodos completos de ajuste mirar. Cada periodo tiene 2016 bloques, unas dos semanas.",
+                "Choose sample",
+                "Select how many complete adjustment periods to inspect. Each period has 2016 blocks, about two weeks.",
             ),
             (
-                "Medir tiempo",
-                "Para cada periodo se consulta el bloque inicial y el bloque del siguiente ajuste, y se calcula cuanto tardo realmente.",
+                "Measure time",
+                "For each period, the initial block and the next adjustment block are queried, and the real elapsed time is calculated.",
             ),
             (
-                "Comparar",
-                "Ese tiempo real se compara con el objetivo teorico: 2016 bloques por 10 minutos cada uno.",
+                "Compare",
+                "That real time is compared with the theoretical target: 2016 blocks times 10 minutes each.",
             ),
             (
-                "Interpretar",
-                "Si el periodo fue rapido, la dificultad tiende a subir; si fue lento, tiende a bajar.",
+                "Interpret",
+                "If the period was fast, difficulty tends to rise; if it was slow, it tends to fall.",
             ),
         ]
     )
@@ -99,41 +99,41 @@ def render_m3() -> None:
     control_col, context_col = st.columns([1, 2.2])
     with control_col:
         period_count = st.selectbox(
-            "Periodos analizados",
+            "Analyzed periods",
             [4, 6, 8, 10, 12],
             index=2,
-            format_func=lambda value: f"{value} periodos",
-            help="Mas periodos dan mas contexto historico, pero requieren mas llamadas a las APIs publicas.",
+            format_func=lambda value: f"{value} periods",
+            help="More periods give more historical context, but require more calls to public APIs.",
         )
     with context_col:
-        st.markdown("#### Que cambia este selector")
+        st.markdown("#### What this selector changes")
         st.write(
-            "Cada periodo contiene 2016 bloques. Si eliges mas periodos, la grafica mira mas historial; "
-            "si eliges menos, se centra en los ajustes mas recientes. Al cambiarlo se vuelven a consultar datos publicos."
+            "Each period contains 2016 blocks. If you choose more periods, the chart looks at more history; "
+            "if you choose fewer, it focuses on the most recent adjustments. Changing it queries public data again."
         )
 
     try:
-        with st.spinner("Consultando bloques de inicio y fin de cada periodo..."):
+        with st.spinner("Querying the start and end blocks of each period..."):
             periods_df = load_difficulty_periods(period_count)
     except BlockchainApiError as exc:
-        st.error(f"No se pudo cargar el historial de dificultad desde las fuentes publicas: {exc}")
+        st.error(f"Could not load difficulty history from public sources: {exc}")
         return
     except Exception as exc:
-        st.error(f"Error inesperado al preparar el historial de dificultad: {exc}")
+        st.error(f"Unexpected error while preparing difficulty history: {exc}")
         return
 
     if periods_df.empty:
-        st.info("No hay periodos completos de ajuste disponibles en la respuesta actual.")
+        st.info("No complete adjustment periods are available in the current response.")
         return
 
     latest_row = periods_df.iloc[-1]
     metric_col_1, metric_col_2, metric_col_3 = st.columns(3)
-    metric_col_1.metric("Ultimo periodo completo", f"{int(latest_row['period_index']):,}")
-    metric_col_2.metric("Dificultad del periodo", human_difficulty(float(latest_row["difficulty"])))
+    metric_col_1.metric("Latest complete period", f"{int(latest_row['period_index']):,}")
+    metric_col_2.metric("Period difficulty", human_difficulty(float(latest_row["difficulty"])))
     metric_col_3.metric(
-        "Media por bloque",
+        "Average per block",
         f"{float(latest_row['average_block_minutes']):.2f} min",
-        delta=f"{(float(latest_row['actual_vs_target_ratio']) - 1) * 100:+.1f}% vs objetivo",
+        delta=f"{(float(latest_row['actual_vs_target_ratio']) - 1) * 100:+.1f}% vs target",
     )
 
     chart_df = periods_df.copy()
@@ -145,10 +145,10 @@ def render_m3() -> None:
         x="period_start",
         y="difficulty",
         markers=True,
-        title="Dificultad de Bitcoin en cada evento de ajuste",
+        title="Bitcoin difficulty at each adjustment event",
         labels={
-            "period_start": "Fecha del ajuste (UTC)",
-            "difficulty": "Dificultad",
+            "period_start": "Adjustment date (UTC)",
+            "difficulty": "Difficulty",
         },
         custom_data=["period_index", "period_start_label", "difficulty_label", "average_block_minutes"],
     )
@@ -156,20 +156,20 @@ def render_m3() -> None:
         line={"width": 3, "color": "#0B7285"},
         marker={"size": 10, "color": "#364FC7", "line": {"width": 2, "color": "#ffffff"}},
         hovertemplate=(
-            "<b>Ajuste %{customdata[0]:,}</b><br>"
-            "Fecha: %{customdata[1]}<br>"
-            "Dificultad: %{customdata[2]}<br>"
-            "Media por bloque: %{customdata[3]:.2f} min"
+            "<b>Adjustment %{customdata[0]:,}</b><br>"
+            "Date: %{customdata[1]}<br>"
+            "Difficulty: %{customdata[2]}<br>"
+            "Average per block: %{customdata[3]:.2f} min"
             "<extra></extra>"
         ),
     )
     for row in periods_df.itertuples():
         difficulty_fig.add_vline(x=row.period_start, line_dash="dot", line_color="rgba(80,80,80,0.35)")
-    st.markdown("#### Grafica 1: como cambia la dificultad")
+    st.markdown("#### Chart 1: how difficulty changes")
     st.write(
-        "Cada punto representa la dificultad vigente al inicio de un periodo de 2016 bloques. "
-        "La linea sube cuando Bitcoin endurece la busqueda de hashes validos y baja cuando la suaviza. "
-        "Las lineas verticales marcan los eventos de ajuste."
+        "Each point represents the difficulty active at the start of a 2016-block period. "
+        "The line rises when Bitcoin makes the search for valid hashes harder and falls when it eases it. "
+        "Vertical lines mark adjustment events."
     )
     st.plotly_chart(style_chart(difficulty_fig, height=430), width="stretch", config={"displayModeBar": False})
 
@@ -177,10 +177,10 @@ def render_m3() -> None:
         chart_df,
         x="period_start",
         y="actual_vs_target_ratio",
-        title="Duracion real del periodo frente al objetivo",
+        title="Real period duration versus target",
         labels={
-            "period_start": "Inicio del periodo (UTC)",
-            "actual_vs_target_ratio": "Duracion real / objetivo",
+            "period_start": "Period start (UTC)",
+            "actual_vs_target_ratio": "Real duration / target",
         },
         custom_data=[
             "period_index",
@@ -197,13 +197,13 @@ def render_m3() -> None:
         marker_line_color="rgba(255,255,255,0.9)",
         marker_line_width=1.2,
         hovertemplate=(
-            "<b>Periodo %{customdata[0]:,}</b><br>"
-            "Inicio: %{customdata[1]}<br>"
-            "Alturas: %{customdata[2]:,} a %{customdata[3]:,}<br>"
-            "Ratio real/objetivo: %{y:.3f}<br>"
-            "Media por bloque: %{customdata[4]:.2f} min<br>"
-            "Duracion real: %{customdata[5]:.2f} dias<br>"
-            "Objetivo: %{customdata[6]:.2f} dias"
+            "<b>Period %{customdata[0]:,}</b><br>"
+            "Start: %{customdata[1]}<br>"
+            "Heights: %{customdata[2]:,} to %{customdata[3]:,}<br>"
+            "Real/target ratio: %{y:.3f}<br>"
+            "Average per block: %{customdata[4]:.2f} min<br>"
+            "Real duration: %{customdata[5]:.2f} days<br>"
+            "Target: %{customdata[6]:.2f} days"
             "<extra></extra>"
         ),
     )
@@ -211,65 +211,65 @@ def render_m3() -> None:
         y=1,
         line_dash="dash",
         line_color="#0B7285",
-        annotation_text="Objetivo",
+        annotation_text="Target",
     )
-    st.markdown("#### Grafica 2: si los bloques fueron rapidos o lentos")
+    st.markdown("#### Chart 2: whether blocks were fast or slow")
     st.write(
-        "Esta grafica calcula la duracion real de cada periodo y la divide entre la duracion esperada. "
-        "El valor ideal es 1: significa que el periodo duro lo esperado. Por debajo de 1, los bloques llegaron mas rapido; "
-        "por encima de 1, llegaron mas lento."
+        "This chart calculates the real duration of each period and divides it by the expected duration. "
+        "The ideal value is 1: it means the period lasted as expected. Below 1, blocks arrived faster; "
+        "above 1, they arrived slower."
     )
     st.plotly_chart(style_chart(ratio_fig, height=420), width="stretch", config={"displayModeBar": False})
 
-    st.markdown("#### Tabla auditada de periodos")
+    st.markdown("#### Auditable period table")
     st.write(
-        "Cada fila representa un periodo completo de 2016 bloques. Asi se puede revisar de donde salen las graficas: altura inicial, siguiente ajuste y tiempo medio por bloque."
+        "Each row represents a complete 2016-block period. This lets you check where the charts come from: initial height, next adjustment, and average time per block."
     )
     display_df = periods_df.copy()
-    display_df["Fecha"] = display_df["period_start"].dt.strftime("%Y-%m-%d")
-    display_df["Dificultad"] = display_df["difficulty"].map(lambda value: human_difficulty(float(value)))
-    display_df["Media por bloque"] = display_df["average_block_minutes"].map(lambda value: f"{float(value):.2f} min")
-    display_df["Ratio real/objetivo"] = display_df["actual_vs_target_ratio"].map(lambda value: f"{float(value):.3f}")
+    display_df["Date"] = display_df["period_start"].dt.strftime("%Y-%m-%d")
+    display_df["Difficulty"] = display_df["difficulty"].map(lambda value: human_difficulty(float(value)))
+    display_df["Average per block"] = display_df["average_block_minutes"].map(lambda value: f"{float(value):.2f} min")
+    display_df["Real/target ratio"] = display_df["actual_vs_target_ratio"].map(lambda value: f"{float(value):.3f}")
     styled_table(
         display_df.rename(
             columns={
-                "period_index": "Periodo",
-                "start_height": "Altura inicial",
-                "next_adjustment_height": "Siguiente ajuste",
+                "period_index": "Period",
+                "start_height": "Start height",
+                "next_adjustment_height": "Next adjustment",
             }
         )[
             [
-                "Periodo",
-                "Altura inicial",
-                "Siguiente ajuste",
-                "Fecha",
-                "Dificultad",
-                "Media por bloque",
-                "Ratio real/objetivo",
+                "Period",
+                "Start height",
+                "Next adjustment",
+                "Date",
+                "Difficulty",
+                "Average per block",
+                "Real/target ratio",
             ]
         ]
     )
 
     st.info(
-        "Regla de lectura: ratio menor que 1 significa que el periodo fue mas rapido que el calendario teorico; ratio mayor que 1 significa que fue mas lento."
+        "Reading rule: a ratio below 1 means the period was faster than the theoretical schedule; a ratio above 1 means it was slower."
     )
 
     latest_ratio = float(latest_row["actual_vs_target_ratio"])
     if latest_ratio < 0.98:
         takeaway(
-            "El ultimo periodo fue mas rapido que el objetivo.",
-            "Eso apunta a que la potencia minera efectiva fue alta durante ese periodo. La respuesta esperada del protocolo es endurecer la dificultad.",
+            "The latest period was faster than the target.",
+            "This suggests effective mining power was high during that period. The expected protocol response is to harden difficulty.",
             tone="warning",
         )
     elif latest_ratio > 1.02:
         takeaway(
-            "El ultimo periodo fue mas lento que el objetivo.",
-            "Eso apunta a que la potencia minera efectiva fue menor o menos eficiente. La respuesta esperada es suavizar la dificultad.",
+            "The latest period was slower than the target.",
+            "This suggests effective mining power was lower or less efficient. The expected response is to soften difficulty.",
             tone="warning",
         )
     else:
         takeaway(
-            "El ultimo periodo quedo cerca del calendario teorico.",
-            "La duracion real esta bastante alineada con el objetivo de dos semanas por cada 2016 bloques.",
+            "The latest period stayed close to the theoretical schedule.",
+            "The real duration is fairly aligned with the two-week target for every 2016 blocks.",
             tone="success",
         )

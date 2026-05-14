@@ -69,6 +69,23 @@ def apply_app_theme() -> None:
             color: #cbd5e1;
         }
 
+        [data-testid="stSidebar"] [data-testid="stMarkdownContainer"] p strong {
+            color: #f8fafc !important;
+            opacity: 1 !important;
+        }
+
+        [data-testid="stSidebar"] [data-testid="stMarkdownContainer"] p:has(strong) {
+            color: #f8fafc !important;
+            opacity: 1 !important;
+        }
+
+        [data-testid="stSidebar"] [data-testid="stMarkdownContainer"] strong,
+        [data-testid="stSidebar"] h1,
+        [data-testid="stSidebar"] h2,
+        [data-testid="stSidebar"] h3 {
+            color: #f8fafc !important;
+        }
+
         h1, h2, h3 {
             color: var(--text);
             letter-spacing: 0;
@@ -108,13 +125,26 @@ def apply_app_theme() -> None:
             accent-color: var(--primary);
         }
 
+        [data-testid="stElementContainer"]:has([data-testid="stRadio"]) {
+            width: 100% !important;
+        }
+
+        [data-testid="stRadio"],
+        [data-testid="stRadio"] > div,
+        [data-testid="stRadio"] > div:nth-child(2) {
+            width: 100% !important;
+        }
+
         [data-testid="stRadio"] [role="radiogroup"] {
             background: rgba(255, 255, 255, 0.72);
             border: 1px solid rgba(219, 228, 234, 0.88);
             border-radius: 8px;
             box-shadow: var(--shadow-soft);
+            display: grid !important;
             gap: 0.45rem;
+            grid-template-columns: repeat(5, minmax(0, 1fr));
             padding: 0.45rem;
+            width: 100% !important;
         }
 
         [data-testid="stRadio"] label {
@@ -124,6 +154,14 @@ def apply_app_theme() -> None:
             min-height: 42px;
             padding: 0.22rem 0.9rem;
             transition: background-color 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
+            justify-content: center;
+            width: 100%;
+        }
+
+        [data-testid="stRadio"] label [data-testid="stMarkdownContainer"],
+        [data-testid="stRadio"] label [data-testid="stMarkdownContainer"] p {
+            text-align: center;
+            width: 100%;
         }
 
         [data-testid="stRadio"] label input[type="radio"] {
@@ -954,6 +992,10 @@ def apply_app_theme() -> None:
                 padding-right: 1rem;
             }
 
+            [data-testid="stRadio"] [role="radiogroup"] {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
             .hero-panel,
             .module-heading,
             .insight-card,
@@ -981,6 +1023,21 @@ def apply_app_theme() -> None:
                 transform: none;
             }
         }
+
+        @media (min-width: 900px) {
+            [data-testid="stSidebar"][aria-expanded="false"] {
+                margin-left: 0 !important;
+                min-width: 25rem !important;
+                transform: translateX(0) !important;
+                visibility: visible !important;
+                width: 25rem !important;
+            }
+
+            [data-testid="stSidebar"][aria-expanded="false"] > div {
+                opacity: 1 !important;
+                visibility: visible !important;
+            }
+        }
         </style>
         """,
         unsafe_allow_html=True,
@@ -992,17 +1049,17 @@ def hero() -> None:
         """
         <section class="hero-panel">
             <div class="hero-eyebrow">ProofLab Bitcoin</div>
-            <h1>Una visita guiada por la prueba de trabajo de Bitcoin</h1>
+            <h1>A guided tour of Bitcoin Proof of Work</h1>
             <p class="hero-copy">
-                Primero se aclaran las piezas basicas de Bitcoin; despues se pasa a datos reales,
-                verificacion local del hash, ajuste de dificultad y deteccion de intervalos raros.
+                First, the basic pieces of Bitcoin are clarified; then the app moves into real data,
+                local hash verification, difficulty adjustment, and detection of unusual intervals.
             </p>
             <div class="status-row">
-                <span class="status-pill">Datos reales</span>
-                <span class="status-pill">Hash verificado</span>
-                <span class="status-pill">Dificultad explicada</span>
-                <span class="status-pill secondary">IA interpretable</span>
-                <span class="status-pill pending">Lectura guiada</span>
+                <span class="status-pill">Real data</span>
+                <span class="status-pill">Verified hash</span>
+                <span class="status-pill">Difficulty explained</span>
+                <span class="status-pill secondary">Interpretable AI</span>
+                <span class="status-pill pending">Guided reading</span>
             </div>
         </section>
         """,
@@ -1104,7 +1161,7 @@ def takeaway(title: str, body: str, *, tone: str = "default") -> None:
     st.markdown(
         (
             f'<section class="takeaway-panel {safe_tone}">'
-            '<div class="takeaway-kicker">Lectura rapida</div>'
+            '<div class="takeaway-kicker">Quick reading</div>'
             f'<div class="takeaway-title">{escape(title)}</div>'
             f'<div class="takeaway-body">{escape(body)}</div>'
             "</section>"
